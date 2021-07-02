@@ -40,7 +40,7 @@ Doxyfile
 *.odg
 *.csv
 *.xml
-*.pdf
+# *.pdf
 *.xlsx
 *.zip
 *.xcf
@@ -68,7 +68,7 @@ tests
 # *.md
 *.so
 *.dcm
-*32g*
+# *32g*
 *32h*
 *32f7*
 *32f4*
