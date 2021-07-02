@@ -1,0 +1,34 @@
+{
+    "type":"MCU",
+    "name":"STM32G030",
+    "title": "ST MCU STM32G030",
+    "description":"ST Cortex-M0 MCU",
+    "Core": {
+        "num": 1,
+        "type":"Cortex-M0",
+        "Freq":120,
+        "DMIPS": 150,
+        "CoreMark": 398
+    },
+    "manufacturer": {
+        "vendor":"ST",
+        "homepage":"https://my.st.com/content/my_st_com/zh/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-mainstream-mcus/stm32g0-series.html"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/SoCXin/STM32G030.git"
+    },
+    "version":"1.0.0",
+    "series":["STM32G030","STM32G030J"],
+    "package":["SO8N","TSSOP20","LQFP32"],
+    "peripheral": ["ADC","DAC","USB","OTG","CAN","SDIO","USART","SPI","IIC"],
+    "keywords": [
+        "dev-platform",
+        "ARM",
+        "Cortex-M",
+        "STMicroelectronics",
+        "STM32",
+        "DAC","SDIO","CAN","I2C","RTC","SPI",
+        "3.6V","1.8V"
+    ]
+}
