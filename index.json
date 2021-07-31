@@ -7,8 +7,8 @@
         "num": 1,
         "type":"Cortex-M0",
         "Freq":64,
-        "DMIPS": 213,
-        "CoreMark": 550
+        "DMIPS": 59,
+        "CoreMark": 142
     },
     "manufacturer": {
         "vendor":"ST",
@@ -20,15 +20,15 @@
     },
     "version":"1.0.0",
     "series":["STM32G030"],
-    "package":["SO8N","TSSOP20","LQFP32"],
-    "peripheral": ["ADC","DAC","USB","OTG","CAN","SDIO","USART","SPI","IIC"],
+    "package":["SO8N","TSSOP20","LQFP32","LQFP48"],
+    "peripheral": ["ADC","USART","SPI","IIC"],
     "keywords": [
         "dev-platform",
         "ARM",
         "Cortex-M",
         "STMicroelectronics",
         "STM32",
-        "ADC","CAN","I2C","RTC","SPI",
+        "ADC","USART","I2C","RTC","SPI",
         "3.6V","1.8V"
     ]
 }
