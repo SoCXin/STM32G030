@@ -1,8 +1,11 @@
 .pio/
 .vscode/
 __pycache__/
+.settings
+.travis.yml
 settings
 Debug
+tests
 *.py[cod]
 *$py.class
 *__pyc*/
@@ -15,7 +18,7 @@ CHANGE*
 # README*
 COPY*
 *CONTRIBU*
-LICENSE*
+# LICENSE*
 HACKING*
 Doxyfile
 *.swp
@@ -26,8 +29,8 @@ Doxyfile
 *.crf
 *.dep
 *.map
-*.hex
-*.bin
+# *.hex
+# *.bin
 *bak
 # *.txt
 *.lst
@@ -48,7 +51,7 @@ Doxyfile
 # *.jpg
 *.rst
 *.srec
-*_sc*
+# *_sc*
 *cm23*
 *cm33*
 *cm7*
@@ -57,12 +60,8 @@ Doxyfile
 *cm1*
 # *cm0*
 *.uvgu*
-.gitmodules
-.settings
-.travis.yml
-doc
+# .gitmodules
 *dox
-tests
 # docs
 # mk
 # *.md

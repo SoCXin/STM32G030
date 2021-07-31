@@ -27,9 +27,7 @@
 
 [STM32G0](https://www.st.com/zh/microcontrollers-microprocessors/stm32g0-series.html)支持更广泛的封装和内存组合，同时具备STM32系列的基本功能，特别适合成本敏感型应用。
 
-[![sites](docs/diff.png)](https://www.st.com/content/st_com/zh/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-mainstream-mcus/stm32g4-series/stm32g4x4.html)
-
-#### 封装规格
+#### 相关规格
 
 * STM32G030J:SO8N
 * STM32G030F:TSSOP20
@@ -44,5 +42,6 @@
 
 * [Arduino_Core_STM32](https://github.com/stm32duino/Arduino_Core_STM32)
 * [STM32CubeG0](https://github.com/STMicroelectronics/STM32CubeG0)
+* [rust API](https://github.com/stm32-rs/stm32g0xx-hal)
 
 ### [探索芯世界 www.SoC.xin](http://www.SoC.Xin)
