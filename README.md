@@ -15,17 +15,18 @@
 * 12bit ADC（2.5 MSps）
 * 5ch x DMA
 
-
 ### [资源收录](https://github.com/SoCXin)
 
 * [参考资源](src/)
 * [相关文档](docs/)
 * [典型应用](project/)
-* [入门教程](https://blog.csdn.net/StormsWzx/article/details/104100723)
+* [入门教程](https://docs.soc.xin/STM32G031.html)
 
 ### [选型建议](https://github.com/SoCXin)
 
 [STM32G0](https://www.st.com/zh/microcontrollers-microprocessors/stm32g0-series.html)支持更广泛的封装和内存组合，同时具备STM32系列的基本功能，特别适合成本敏感型应用。
+
+ [STM32G031](https://www.st.com/content/st_com/zh/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-mainstream-mcus/stm32g0-series/stm32g0x1.html) 相较 [STM32G030](https://www.st.com/content/st_com/zh/products/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus/stm32-mainstream-mcus/stm32g0-series/stm32g0x0-value-line.html) 模拟升级功能并增加安全功能，最主要的包括新增 USB-PD/CAN-FD/AES256，产品的型号规格更加丰富。
 
 #### 相关规格
 
