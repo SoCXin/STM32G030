@@ -2,7 +2,7 @@
 
 [![sites](http://182.61.61.133/link/resources/SoC.png)](http://www.SoC.Xin)
 
-* [ST](https://www.st.com/zh/): [Cortex-M0](https://github.com/SoCXin/Cortex)
+* [ST](https://www.st.com/zh/): [Cortex-M0+](https://github.com/SoCXin/Cortex)
 * [L3R3](https://github.com/SoCXin/Level): 64 MHz (59 DMIPS, 142 CoreMark)
 
 ## [简介](https://github.com/SoCXin/STM32G030/wiki)
@@ -20,7 +20,7 @@
 * [参考资源](src/)
 * [相关文档](docs/)
 * [典型应用](project/)
-* [入门教程](https://docs.soc.xin/STM32G031.html)
+* [入门教程](https://docs.soc.xin/STM32G030.html)
 
 ### [选型建议](https://github.com/SoCXin)
 
