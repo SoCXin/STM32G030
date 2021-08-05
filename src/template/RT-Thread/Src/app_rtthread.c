@@ -1,14 +1,3 @@
-/**
-  ******************************************************************************
-  * @author  https://gzwelink.taobao.com
-  * @version V1.0
-  * @date    2020.01.01
-  * @brief   RT-Thread系统实验
-  ******************************************************************************
-  * @attention
-  * 实验平台:MINI-STM32G030C8开发板 
-  ******************************************************************************
-  */
 
 #include <rtthread.h>
 #include "main.h"
@@ -19,7 +8,7 @@ void LED1Main(void *parameter)
 {
 while(1)
 {
-		rt_thread_delay(200);//50ms
+		rt_thread_delay(300);
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_RESET);
 }
 
@@ -30,7 +19,7 @@ void LED2Main(void *parameter)
 {
 while(1)
 {
-	rt_thread_delay(50);//200ms
+	rt_thread_delay(150);
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_SET);
 }
 

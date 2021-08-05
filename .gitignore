@@ -59,7 +59,6 @@ Doxyfile
 *cm1*
 # *cm0*
 *.uvgu*
-# .gitmodules
 *dox
 # docs
 # mk
