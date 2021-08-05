@@ -81,6 +81,7 @@ RTE
 DebugConfig
 *.d
 *.o
+*.iex
 *.axf
 *.lnp
 *.htm
