@@ -13,12 +13,11 @@ tests
 *.autosave
 *~
 *#
-Change*
 CHANGE*
-# README*
+README*
 COPY*
 *CONTRIBU*
-# LICENSE*
+LICENSE*
 HACKING*
 Doxyfile
 *.swp
@@ -29,26 +28,26 @@ Doxyfile
 *.crf
 *.dep
 *.map
-# *.hex
-# *.bin
+*.hex
+*.bin
 *bak
-# *.txt
+*.txt
 *.lst
 *.sct
 *.elf
-# *.ini
+*.ini
 *.gbr
 *.drl
 *.ods
 *.odg
 *.csv
 *.xml
-# *.pdf
+*.pdf
 *.xlsx
 *.zip
 *.xcf
-# *.png
-# *.jpg
+*.png
+*.jpg
 *.rst
 *.srec
 # *_sc*
