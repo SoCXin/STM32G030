@@ -1,23 +1,14 @@
 /* USER CODE BEGIN Header */
-/***************************************************************************//**
-  ÎÄ¼şÃû³Æ: main.c
-  ×÷¡¡  Õß: Zhengyu https://gzwelink.taobao.com
-  °æ    ±¾: V1.0.0
-  ÈÕ  ¡¡ÆÚ: 2020Äê1ÔÂ1ÈÕ
-	ÊÊÓÃÓ²¼ş:MINI-G030C8T6 ¿ª·¢°å
-  * Ö£ÖØÉùÃ÷£º
-  * ´ËÎÄ¼şÖ»ÓÃÓÚÌá¹©¿ª·¢²Î¿¼
-*******************************************************************************/
+
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
-#include "ucos_ii.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "ucos_ii.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,57 +25,44 @@
 static   OS_STK   App_Task_LED1_Stk[APP_TASK_LED1_STK_SIZE];
 static   OS_STK   App_Task_LED2_Stk[APP_TASK_LED2_STK_SIZE];
 
-/* ÈÎÎñº¯Êı ------------------------------------------------------------------*/
+/* ä»»åŠ¡å‡½æ•° ------------------------------------------------------------------*/
 static  void  App_Task_LED1(void* p_arg);
 static  void  App_Task_LED2(void* p_arg);
-;/***************************************************************************************
-;* º¯ÊıÃû³Æ: App_Task_LED1 
-;*
-;* ¹¦ÄÜÃèÊö: LED1ÉÁË¸£¬ÖÜÆÚ500ms
-;*            
-;* ²Î    Êı: None
-;*
-;* ·µ »Ø Öµ: None
-;*         
-;* ×÷¡¡  Õß: Zhengyu https://gzwelink.taobao.com
-;* ÈÕ  ¡¡ÆÚ: 2020Äê1ÔÂ1ÈÕ
-;*----------------------------------------------------------------------------------------
-;*****************************************************************************************/ 
 INT32U TimeCounter;
 void App_Task_LED1(void* pdata)
 {
     pdata = pdata;
 
     for (;;)
-    {     
-				 OSTimeDly(50);
-         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_SET);
+    {
+        OSTimeDly(100);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_SET);
     }
 
 }
 
 ;/***************************************************************************************
-;* º¯ÊıÃû³Æ: App_Task_LED2
+;* å‡½æ•°åç§°: App_Task_LED2
 ;*
-;* ¹¦ÄÜÃèÊö: LED2ÉÁË¸£¬ÖÜÆÚ1000ms
-;*            
-;* ²Î    Êı: None
+;* åŠŸèƒ½æè¿°: LED2é—ªçƒï¼Œå‘¨æœŸ1000ms
 ;*
-;* ·µ »Ø Öµ: None
-;*         
-;* ×÷¡¡  Õß: Zhengyu https://gzwelink.taobao.com
-;* ÈÕ  ¡¡ÆÚ: 2020Äê1ÔÂ1ÈÕ
+;* å‚    æ•°: None
+;*
+;* è¿” å› å€¼: None
+;*
+;* ä½œã€€  è€…: Zhengyu https://gzwelink.taobao.com
+;* æ—¥  ã€€æœŸ: 2020å¹´1æœˆ1æ—¥
 ;*----------------------------------------------------------------------------------------
-;*****************************************************************************************/ 
+;*****************************************************************************************/
 void App_Task_LED2(void* pdata)
 {
     pdata = pdata;
 
     for (;;)
     {
-         OSTimeDly(200);
-			TimeCounter++;
-         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_RESET);
+        OSTimeDly(200);
+        TimeCounter++;
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4,GPIO_PIN_RESET);
     }
 }
 /* USER CODE END PM */
@@ -115,7 +93,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 INT8U os_err;
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -139,27 +116,27 @@ INT8U os_err;
  OSInit();
 		OS_CPU_SysTickInit();
 
-	//´´½¨ÈÎÎñ1:LED1
+	//åˆ›å»ºä»»åŠ¡1:LED1
 	os_err = OSTaskCreate(App_Task_LED1,
 												(void *) 0,
 												(OS_STK *) &App_Task_LED1_Stk[APP_TASK_LED1_STK_SIZE - 1],
 												(INT8U) APP_TASK_LED1_PRIO);
 
-		//´´½¨ÈÎÎñ2:LED2
+		//åˆ›å»ºä»»åŠ¡2:LED2
 	os_err = OSTaskCreate(App_Task_LED2,
 												(void*) 0,
 												(OS_STK*) &App_Task_LED2_Stk[APP_TASK_LED2_STK_SIZE - 1],
 												(INT8U ) APP_TASK_LED2_PRIO);
-	
+
 	os_err = os_err;
 
-	
+
 	OSStart ();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
- 
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -176,10 +153,10 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -195,7 +172,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
@@ -234,7 +211,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
