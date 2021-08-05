@@ -21,12 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
-#include "oled.h"
-#include "bmp.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "oled.h"
+#include "bmp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,11 +65,9 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-	unsigned char t;
   /* USER CODE BEGIN 1 */
-
+	unsigned char t;
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -91,35 +88,38 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  OLED_Init();			       //鍒濆鍖朞LED
+  OLED_Clear()  	;
+  t=' ';
   /* USER CODE END 2 */
 
-		OLED_Init();			       //初始化OLED  
-		OLED_Clear()  	; 
-		t=' ';
-	while(1) 
-	{		
-		OLED_Clear();
-    OLED_ShowCHinese(18,0,0);//光
-		OLED_ShowCHinese(36,0,1);//子
-		OLED_ShowCHinese(54,0,2);//物
-		OLED_ShowCHinese(72,0,3);//联
-		OLED_ShowCHinese(90,0,4);//网
-	
-		OLED_ShowString(6,3,"0.96' OLED TEST",16);
-		OLED_ShowString(0,6,"ASCII:",16);  
-		OLED_ShowString(63,6,"CODE:",16);  
-		OLED_ShowChar(48,6,t,16);//显示ASCII字符	   
-		t++;
-		if(t>'~')t=' ';
-		OLED_ShowNum(103,6,t,3,16);//显示ASCII字符的码值 	
-		HAL_Delay(2000);
-	
-		
-		OLED_DrawBMP(0,0,128,8,BMP5);
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
 
-		HAL_Delay(2000);
-	}	  
+    /* USER CODE BEGIN 3 */
+    OLED_Clear();
+    OLED_ShowCHinese(18,0,0);
+    OLED_ShowCHinese(36,0,1);
+    OLED_ShowCHinese(54,0,2);
+    OLED_ShowCHinese(72,0,3);
+    OLED_ShowCHinese(90,0,4);
+
+    OLED_ShowString(6,3,"0.96' OLED TEST",16);
+    OLED_ShowString(0,6,"ASCII:",16);
+    OLED_ShowString(63,6,"CODE:",16);
+    OLED_ShowChar(48,6,t,16);//鏄剧ずASCII瀛楃
+    t++;
+    if(t>'~')t=' ';
+    OLED_ShowNum(103,6,t,3,16);//鏄剧ずASCII瀛楃鐨勭爜
+    HAL_Delay(2000);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+    OLED_DrawBMP(0,0,128,8,BMP5);
+    HAL_Delay(2000);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+  }
   /* USER CODE END 3 */
 }
 
@@ -132,10 +132,10 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -146,7 +146,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
@@ -185,7 +185,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

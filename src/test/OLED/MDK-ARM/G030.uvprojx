@@ -189,7 +189,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32G030xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32G0xx_HAL_Driver/Inc;../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32G0xx/Include;../Drivers/CMSIS/Include;../Src</IncludePath>
+              <IncludePath>../Inc;  ../Drivers/STM32G0xx_HAL_Driver/Inc;  ../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;  ../Drivers/CMSIS/Device/ST/STM32G0xx/Include;  ../Drivers/CMSIS/Include;  ../Src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -394,6 +394,11 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\oled.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>
@@ -404,11 +409,6 @@
               <FilePath>../Src/gpio.c</FilePath>
             </File>
             <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/sys.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32g0xx_it.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32g0xx_it.c</FilePath>
@@ -417,11 +417,6 @@
               <FileName>stm32g0xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32g0xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>oled.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\oled.c</FilePath>
             </File>
           </Files>
         </Group>
