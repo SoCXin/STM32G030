@@ -152,4 +152,3 @@ void FlashTestWR(void)
 	}
 	FlashPageRead(USER_APP_ADDRESS, FlashWriteBuf);
 }
-//============================================================================

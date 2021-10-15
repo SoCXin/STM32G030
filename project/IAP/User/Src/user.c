@@ -21,11 +21,11 @@ int task(void)
 {
 	PowUpKeyInputState();
 	ApplicationSelect();
-	//FlashTestWR();
+	FlashTestWR();
 	while (1)
 	{
-	HAL_IWDG_Refresh(&hiwdg);
-	Ymodem_Transmit(USER_APP_ADDRESS);
+		HAL_IWDG_Refresh(&hiwdg);
+		Ymodem_Transmit(USER_APP_ADDRESS);
 	}
 }
 

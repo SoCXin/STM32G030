@@ -12,6 +12,7 @@ extern "C" {
 
 extern uint32_t u32aResultDMA[AD_CH_NUM/2];
 
+void HAL_SYSTICK_Callback(void);
 
 #ifdef __cplusplus
 }

@@ -13,21 +13,19 @@ uint8_t  u8KeyInputSate;
 //==============================================================================
 void ApplicationSelect(void)
 {
-	if(u8KeyInputSate == 0)//(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5)) //0- no key pressed
+	if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)) //(u8KeyInputSate == 0)//
 	{//如果上电没有按键执行用户代码
-		//跳转至用户代码
 		if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
 		{
 			JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
 			Jump_To_Application = (pFunction) JumpAddress;
-
 			//初始化用户程序的堆栈指针
 			__set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
-
 			Jump_To_Application();
 		}
 	}
 }
+
 //==============================================================================
 
 //==============================================================================
