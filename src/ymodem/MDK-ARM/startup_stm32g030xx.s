@@ -1,7 +1,7 @@
 ;******************************************************************************
-;* File Name          : startup_stm32g070xx.s
+;* File Name          : startup_stm32g030xx.s
 ;* Author             : MCD Application Team
-;* Description        : STM32G070xx devices vector table for MDK-ARM toolchain.
+;* Description        : STM32G030xx devices vector table for MDK-ARM toolchain.
 ;*                      This module performs:
 ;*                      - Set the initial SP
 ;*                      - Set the initial PC == Reset_Handler
@@ -14,7 +14,7 @@
 ;****************************************************************************** 
 ;* @attention
 ;*
-;* Copyright (c) 2018 STMicroelectronics. All rights reserved.
+;* Copyright (c) 2019 STMicroelectronics. All rights reserved.
 ;*
 ;* This software component is licensed by ST under BSD 3-Clause license,
 ;* the "License"; You may not use this file except in compliance with the 
@@ -86,16 +86,16 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     0                              ; Reserved
                 DCD     DMA1_Channel1_IRQHandler       ; DMA1 Channel 1
                 DCD     DMA1_Channel2_3_IRQHandler     ; DMA1 Channel 2 and Channel 3
-                DCD     DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler ; DMA1 Channel 4 to Channel 7, DMAMUX1 overrun
+                DCD     DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler ; DMA1 Channel 4 to Channel 5, DMAMUX1 overrun
                 DCD     ADC1_IRQHandler                ; ADC1
                 DCD     TIM1_BRK_UP_TRG_COM_IRQHandler ; TIM1 Break, Update, Trigger and Commutation
                 DCD     TIM1_CC_IRQHandler             ; TIM1 Capture Compare
                 DCD     0                              ; Reserved
                 DCD     TIM3_IRQHandler                ; TIM3
-                DCD     TIM6_IRQHandler                ; TIM6
-                DCD     TIM7_IRQHandler                ; TIM7
+                DCD     0                              ; Reserved
+                DCD     0                              ; Reserved
                 DCD     TIM14_IRQHandler               ; TIM14
-                DCD     TIM15_IRQHandler               ; TIM15
+                DCD     0                              ; Reserved
                 DCD     TIM16_IRQHandler               ; TIM16
                 DCD     TIM17_IRQHandler               ; TIM17
                 DCD     I2C1_IRQHandler                ; I2C1
@@ -104,7 +104,9 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     SPI2_IRQHandler                ; SPI2
                 DCD     USART1_IRQHandler              ; USART1
                 DCD     USART2_IRQHandler              ; USART2
-                DCD     USART3_4_IRQHandler            ; USART3, USART4
+                DCD     0                              ; Reserved
+                DCD     0                              ; Reserved
+                DCD     0                              ; Reserved
 
 __Vectors_End
 
@@ -158,15 +160,12 @@ Default_Handler PROC
                 EXPORT  EXTI4_15_IRQHandler            [WEAK]
                 EXPORT  DMA1_Channel1_IRQHandler       [WEAK]
                 EXPORT  DMA1_Channel2_3_IRQHandler     [WEAK]
-                EXPORT  DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler [WEAK]
+                EXPORT  DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler [WEAK]
                 EXPORT  ADC1_IRQHandler                [WEAK]
                 EXPORT  TIM1_BRK_UP_TRG_COM_IRQHandler [WEAK]
                 EXPORT  TIM1_CC_IRQHandler             [WEAK]
                 EXPORT  TIM3_IRQHandler                [WEAK]
-                EXPORT  TIM6_IRQHandler                [WEAK]
-                EXPORT  TIM7_IRQHandler                [WEAK]
                 EXPORT  TIM14_IRQHandler               [WEAK]
-                EXPORT  TIM15_IRQHandler               [WEAK]
                 EXPORT  TIM16_IRQHandler               [WEAK]
                 EXPORT  TIM17_IRQHandler               [WEAK]
                 EXPORT  I2C1_IRQHandler                [WEAK]
@@ -175,7 +174,6 @@ Default_Handler PROC
                 EXPORT  SPI2_IRQHandler                [WEAK]
                 EXPORT  USART1_IRQHandler              [WEAK]
                 EXPORT  USART2_IRQHandler              [WEAK]
-                EXPORT  USART3_4_IRQHandler            [WEAK]
 
 
 WWDG_IRQHandler
@@ -187,15 +185,12 @@ EXTI2_3_IRQHandler
 EXTI4_15_IRQHandler
 DMA1_Channel1_IRQHandler
 DMA1_Channel2_3_IRQHandler
-DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler
+DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler
 ADC1_IRQHandler
 TIM1_BRK_UP_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM3_IRQHandler
-TIM6_IRQHandler
-TIM7_IRQHandler
 TIM14_IRQHandler
-TIM15_IRQHandler
 TIM16_IRQHandler
 TIM17_IRQHandler
 I2C1_IRQHandler
@@ -204,7 +199,6 @@ SPI1_IRQHandler
 SPI2_IRQHandler
 USART1_IRQHandler
 USART2_IRQHandler
-USART3_4_IRQHandler
 
                 B       .
 
