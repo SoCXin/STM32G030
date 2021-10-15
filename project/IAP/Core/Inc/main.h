@@ -64,6 +64,11 @@ void Error_Handler(void);
 #define LED1_Pin GPIO_PIN_4
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+  #define DIGITAL_SCALE_12BITS             ((uint32_t) 0xFFF)
+  /* Init variable out of ADC expected conversion data range */
+  #define VAR_CONVERTED_DATA_INIT_VALUE    (DIGITAL_SCALE_12BITS + 1)
+  /* Definition of ADCx conversions data table size */
+  #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  8)
 
 /* USER CODE END Private defines */
 
