@@ -1,11 +1,4 @@
-/*******************************************************************************
-  * @file    ymodem_daxia.c
-  * @author  
-  * @version V2.0.2
-  * @date    2020.11.02
-  * @brief   Y-Modem 协议文件接收
-  *****************************************************************************/
-#include "main.h"
+#include "user.h"
 #include "bootloader.h"
 #include "ymodem.h"
 #include "uart.h"
@@ -23,7 +16,7 @@ uint16_t Y_Modem_CRC(uint8_t * buf, uint16_t len)
     uint16_t stat;
     uint16_t i;
     uint8_t * in_ptr;
-   
+
     //指向要计算CRC的缓冲区开头
     in_ptr = buf;
     chsum = 0;
@@ -70,7 +63,7 @@ void Send_CMD(uint8_t cmd)
 	uint8_t buf[2];
 	buf[0] = cmd;
 	buf[1] = 0;
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -78,7 +71,7 @@ void Send_CMD(uint8_t cmd)
 void txDownloadSuccess()
 {
 	static uint8_t buf[] = "Firmware download success! Restarting......\r\n";
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -86,7 +79,7 @@ void txDownloadSuccess()
 void msg_updating()
 {
 	static uint8_t buf[] = "Updating......\r\n";
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -95,7 +88,7 @@ void msg_updating()
 void msg_SlaveUpdateFail()
 {
 	static uint8_t buf[] = "\r\nFirmware Update fail! Time out!\r\n";
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -103,7 +96,7 @@ void msg_SlaveUpdateFail()
 void msg_enter()
 {
 	static uint8_t buf[] = "\r\n";
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -111,7 +104,7 @@ void msg_enter()
 void msg_verifChksumError()
 {
 	static uint8_t buf[] = "Verify checkSum error!\r\n";
-	HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -128,26 +121,26 @@ volatile uint32_t u16FirmeareChksum;
 uint8_t  u8Program1K;
 uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 {
-  	
+
   uint16_t len;
   uint16_t temp;
   uint16_t i;
   uint8_t  state = 0;
-  
+
   if((u8UartRxBuf[0] == MODEM_SOH) || (u8UartRxBuf[0] == MODEM_STX))
   {
     len = TAB_YMODE_LEN[u8UartRxBuf[0] - 1] + 5;
     if(u16Uart1RxIndex >= len)
     {
       u16Uart1RxIndex = 0;
-            
+
       if((u8UartRxBuf[1] + u8UartRxBuf[2]) == 0xff)
       {
         if((u8EndState == 2) && (u8UartRxBuf[1] == 0))
         {
-          state = 1;		  
+          state = 1;
           Send_CMD(MODEM_ACK);
-        }   
+        }
         else
         {
           temp = u8UartRxBuf[len-2];
@@ -158,9 +151,9 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
           if(temp == chk_crc) //Y_Modem_CRC(&u8UartRxBuf[3], len-5))
           {
             if(u8TranState == 2)
-            {							
+            {
 							uint32_t u32ProgramSize;
-							u32ProgramSize = PragamerAddr - START_ADDR;			
+							u32ProgramSize = PragamerAddr - START_ADDR;
 							if(u16FirmeareSize > u32ProgramSize)
 							{
 								if((u16FirmeareSize - u32ProgramSize) >= FLASH_PAGE_SIZE)
@@ -169,22 +162,22 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 									{
 										FlashWriteBuf[(len-5) * u8CntRxFlame + i] = u8UartRxBuf[3+i];
 									}
-									
+
 									if(++u8CntRxFlame >= FLASH_PAGE_SIZE / (len - 5))
 									{
-										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test										
-										FlashPageWrite(PragamerAddr, FlashWriteBuf);									
-										u16CntFlashPage++;	
+										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);test
+										FlashPageWrite(PragamerAddr, FlashWriteBuf);
+										u16CntFlashPage++;
 										PragamerAddr += FLASH_PAGE_SIZE;
-										u8CntRxFlame = 0;										
-									}			
+										u8CntRxFlame = 0;
+									}
 								}
-								else 
+								else
 								{//小于2K
 									if(u8Program1K == 0)
 									{
 										if((u16FirmeareSize - u32ProgramSize) >= 1024)
-										{//1K~2K										
+										{//1K~2K
 											for(i=0; i<1024; i++)
 											{
 												FlashWriteBuf[i] = u8UartRxBuf[3+i];
@@ -192,28 +185,28 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 											u8Program1K = 1;
 										}
 										else
-										{//<1K	
+										{//<1K
 											for(i=0; i<1024; i++)
 											{
 												FlashWriteBuf[i] = u8UartRxBuf[3+i];
 											}
-											//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test
+											//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);test
 											FlashPageWrite(PragamerAddr, FlashWriteBuf);
 										}
-									}		
+									}
 									else if(u8Program1K == 1)
 									{
 										for(i=0; i<1024; i++)
 										{
-											FlashWriteBuf[1024 + i] = u8UartRxBuf[3+i];											
-										}	
-										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test
-										FlashPageWrite(PragamerAddr, FlashWriteBuf); 
-									}										
+											FlashWriteBuf[1024 + i] = u8UartRxBuf[3+i];
+										}
+										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);test
+										FlashPageWrite(PragamerAddr, FlashWriteBuf);
+									}
 								}
 							}
             }
-                     
+
             state = 1;
           }
           else
@@ -221,7 +214,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
             Send_CMD(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
           }
         }
-               
+
         u16Wait10ms = 25;
       }
     }
@@ -229,20 +222,20 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
   else if(u8UartRxBuf[0] == MODEM_EOT)
   {//接收到传输完成，发送NAK和ACK应答
     if(u8EndState == 0)
-    {      
+    {
       Send_CMD(MODEM_NAK);
-			
+
       u8EndState = 1;
     }
     else if(u8EndState == 1)
-    {            
+    {
       Send_CMD(MODEM_ACK);
       delay_ms(2);
       //Send_CMD(MODEM_C);
       u8EndState = 2;
     }
   }
-    
+
   return state;
 }
 //============================================================================
@@ -277,7 +270,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
 {
   switch(u8TranState)
   {
-    case 0:      
+    case 0:
       u16Uart1RxIndex = 0;
       u8YmodeType = 0;
       u8EndState = 0;
@@ -288,7 +281,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
       u16Wait10ms = 25;
       u8TranState = 1;
     break;
-    
+
     case 1:
       if(u16Wait10ms)
       {
@@ -299,9 +292,9 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             Send_CMD(MODEM_ACK);
             delay_ms(2);
             Send_CMD(MODEM_C);
-            
+
 			u16FirmeareSize = GetFirmwareSize(u8UartRxBuf);
-			u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);			
+			u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);
             PragamerAddr = START_ADDR;
 						u8Program1K = 0;
 						u8TranState = 2;
@@ -312,19 +305,19 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
       else
       {
         u8TranState = 0; //超时继续发送“C”等待接收文件
-      }      
+      }
     break;
-    
-    case 2:           
+
+    case 2:
       if(u16Wait10ms)
       {
         if(YmodemReceiveDate(START_ADDR))
         {
           Send_CMD(MODEM_ACK);
 					u8TimeOut250ms = 0;
-        }  				
+        }
       }
-      else 
+      else
       {
         if(u8EndState < 2)
         {
@@ -338,15 +331,15 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
 					msg_enter();
           u8TranState = 3;
         }
-      }        
+      }
     break;
-    
-    case 3:   
+
+    case 3:
 			if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
-			{		
+			{
         chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
 				if(chksum == u16FirmeareChksum)
-				{//如果和发送的校验和相等则重启完成升级					
+				{//如果和发送的校验和相等则重启完成升级
 					txDownloadSuccess();
 					//u8TranState = 4; //程序下载完成
 					delay_ms(500);
@@ -361,17 +354,17 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
 			else
 			{
 				static uint8_t buf[] = "Data Verify error!\r\n";
-				HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+				HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 				u8TranState = 4; //0 重新发起接收请求
-			}      
+			}
     break;
-    
+
     case 4:
-      
+
     break;
-		    
+
     default:
-      
+
     break;
   }
 }
@@ -384,11 +377,11 @@ void Wait10msCountDwn(void)
 	if(++u8Cnt1ms >= 10)
 	{
 		u8Cnt1ms = 0;
-		if(u16Wait10ms) 
+		if(u16Wait10ms)
 		{
-			u16Wait10ms--;	
+			u16Wait10ms--;
 		}
-	}  
+	}
 }
 //============================================================================
 
@@ -409,7 +402,7 @@ uint8_t CharToHex(uint8_t str)
 	{
 		num = str - 0x57;
 	}
-	
+
 	return num;
 }
 //============================================================================
@@ -427,7 +420,7 @@ uint16_t GetRxBufSize(uint8_t *rxbuf)
 	{
 		size = 1024;
 	}
-	
+
 	return size;
 }
 //============================================================================
@@ -451,13 +444,13 @@ uint32_t GetFirmwareSize(uint8_t *rxbuf)
 			get_size /= 10;
 			break;
 		}
-		
+
 		if(rxbuf[i] == 0x00)
 		{
 			index++;
 		}
 	}
-	
+
 	return get_size;
 }
 //============================================================================
@@ -481,13 +474,13 @@ uint32_t GetFirmwareChksum(uint8_t *rxbuf)
 			chksum >>= 4;
 			break;
 		}
-		
+
 		if(rxbuf[i] == 0x00)
 		{
 			index++;
 		}
 	}
-	
+
 	return chksum;
 }
 //============================================================================
@@ -502,7 +495,7 @@ uint32_t CalcRomChksum(uint32_t address, uint32_t length)
 		chksum += *(uint8_t *)address;
 		address++;
 	}
-	
+
 	return chksum;
 }
 //============================================================================

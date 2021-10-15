@@ -4,7 +4,7 @@
   * @brief          : uart head file
   ******************************************************************************
  */
- 
+
 #ifndef __BOOTLOADER_H
 #define __BOOTLOADER_H
 
@@ -28,9 +28,8 @@ void ApplicationSelect(void);
 void PowerUpCounter(void);
 void PowUpKeyInputState(void);
 void Iap_Indicator(void);
- 
- #ifdef __cplusplus
+
+#ifdef __cplusplus
 }
 #endif
-
 #endif

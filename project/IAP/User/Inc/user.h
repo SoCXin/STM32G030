@@ -8,14 +8,13 @@ extern "C" {
 
 #include "main.h"
 
+#define AD_CH_NUM 2
+
 extern uint32_t u32aResultDMA[AD_CH_NUM/2];
 
-/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
 #endif
+#endif
 
-#endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -32,7 +32,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+extern ADC_HandleTypeDef hadc1;
+extern IWDG_HandleTypeDef hiwdg;
+extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

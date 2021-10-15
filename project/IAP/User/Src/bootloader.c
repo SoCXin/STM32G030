@@ -1,11 +1,4 @@
-/**
-  ******************************************************************************
-  * @file           : bootloader.c
-  * @brief          : uart sub program body
-  ******************************************************************************
- */
- 
-#include "main.h"
+#include "user.h"
 #include "string.h"
 #include "bootloader.h"
 #include "ymodem.h"
@@ -26,11 +19,11 @@ void ApplicationSelect(void)
 		if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
 		{
 			JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
-			Jump_To_Application = (pFunction) JumpAddress;								
+			Jump_To_Application = (pFunction) JumpAddress;
 
 			//初始化用户程序的堆栈指针
-			__set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);				
-				
+			__set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
+
 			Jump_To_Application();
 		}
 	}
@@ -49,7 +42,7 @@ void PowerUpCounter(void)
 			u16Timer1sec++;
 		}
 	}
-	
+
 	if(u8AdcTrig1ms < 0xff)
 	{
 		u8AdcTrig1ms++;
@@ -62,27 +55,27 @@ u8 u8KeyInputChkOver;
 void PowUpKeyInputState(void)
 {
 	uint16_t u16AdValueKey;
-	uint16_t u16KeyPress = 0;	
+	uint16_t u16KeyPress = 0;
 	uint8_t u8KeyInputSateOld = 0;
 	u8KeyInputSate = 0;
 	u8KeyInputChkOver = 0;
-	
+
 	READ_KEY_AD:
 	if(u8KeyInputSateOld != u8KeyInputSate)
 	{
 		u16KeyPress = 0;
 		u8KeyInputSateOld = u8KeyInputSate;
 	}
-	
+
 	while(u8AdcTrig1ms < 10)
 	{
-		HAL_IWDG_Refresh(&hiwdg);			
+		HAL_IWDG_Refresh(&hiwdg);
 	}
-	
+
 	u8AdcTrig1ms = 0;
 	HAL_ADC_Start_DMA(&hadc1, (u32*)&u32aResultDMA, AD_CH_NUM); //
 	u16AdValueKey = (uint16_t)u32aResultDMA[0];
-	
+
 	if(u16AdValueKey >= 800 && u16AdValueKey <= 950)
 	{
 		u8KeyInputSate = 1;
@@ -100,8 +93,8 @@ void PowUpKeyInputState(void)
 			HAL_IWDG_Refresh(&hiwdg);
 			goto READ_KEY_AD;
 		}
-	}	
-	
+	}
+
 	u16Timer1ms = 0;
 	u16Timer1sec = 0;
 	while(u16Timer1ms < 100);
@@ -117,11 +110,11 @@ void Iap_Indicator(void)
 	{
 		return;
 	}
-	
+
 	if(u8TranState <= 1)
 	{
 		u8Cnt5HzDelay = 0;
-		HAL_GPIO_WritePin(Led1_GPIO_Port, Led1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		if(u16Timer1sec >= 30)
 		{
 			McuReset();
@@ -131,11 +124,11 @@ void Iap_Indicator(void)
 	{
 		if(u16Timer1ms < 500)
 		{
-			HAL_GPIO_WritePin(Led1_GPIO_Port, Led1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		}
 		else
 		{
-			HAL_GPIO_WritePin(Led1_GPIO_Port, Led1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
 		}
 	}
 	else
@@ -143,11 +136,11 @@ void Iap_Indicator(void)
 		if(u8AdcTrig1ms >= 100)
 		{
 			u8AdcTrig1ms = 0;
-			HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);
+			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 			if(++u8Cnt5HzDelay >= 30)
 			{
 				uint8_t buf[] = "\r\nSTM32G070CB UART2(115200) Bootloader V1.0.\r\n";
-				HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
+				HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 				u8TranState = 0;
 			}
 		}

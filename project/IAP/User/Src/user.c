@@ -19,14 +19,13 @@ void HAL_SYSTICK_Callback(void)
 
 int task(void)
 {
-
 	PowUpKeyInputState();
 	ApplicationSelect();
 	//FlashTestWR();
-  while (1)
-  {
-		HAL_IWDG_Refresh(&hiwdg);
-		Ymodem_Transmit(USER_APP_ADDRESS);
-  }
+	while (1)
+	{
+	HAL_IWDG_Refresh(&hiwdg);
+	Ymodem_Transmit(USER_APP_ADDRESS);
+	}
 }
 
