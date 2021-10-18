@@ -144,7 +144,6 @@ void FlashTestWR(void)
 			j = 255;
 		}
 	}
-
 	FlashPageWrite(USER_APP_ADDRESS, FlashWriteBuf);
 	for(i=0; i<FLASH_PAGE_SIZE; i++)
 	{

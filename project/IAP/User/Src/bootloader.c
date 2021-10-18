@@ -14,12 +14,12 @@ uint8_t  u8KeyInputSate;
 void ApplicationSelect(void)
 {
 	if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)) //(u8KeyInputSate == 0)//
-	{//如果上电没有按键执行用户代码
+	{//濡傛灉涓婄數娌℃湁鎸夐敭鎵ц鐢ㄦ埛浠ｇ爜
 		if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
 		{
 			JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
 			Jump_To_Application = (pFunction) JumpAddress;
-			//初始化用户程序的堆栈指针
+			//鍒濆鍖栫敤鎴风▼搴忕殑鍫嗘爤鎸囬拡
 			__set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
 			Jump_To_Application();
 		}
@@ -32,19 +32,18 @@ void ApplicationSelect(void)
 uint8_t  u8AdcTrig1ms;
 void PowerUpCounter(void)
 {
-	if(++u16Timer1ms >= 1000)
-	{
-		u16Timer1ms = 0;
-		if(u16Timer1sec < 0xffff)
-		{
-			u16Timer1sec++;
-		}
-	}
-
-	if(u8AdcTrig1ms < 0xff)
-	{
-		u8AdcTrig1ms++;
-	}
+    if(++u16Timer1ms >= 1000)
+    {
+        u16Timer1ms = 0;
+        if(u16Timer1sec < 0xffff)
+        {
+            u16Timer1sec++;
+        }
+    }
+    if(u8AdcTrig1ms < 0xff)
+    {
+        u8AdcTrig1ms++;
+    }
 }
 //==============================================================================
 
@@ -57,19 +56,16 @@ void PowUpKeyInputState(void)
 	uint8_t u8KeyInputSateOld = 0;
 	u8KeyInputSate = 0;
 	u8KeyInputChkOver = 0;
-
 	READ_KEY_AD:
 	if(u8KeyInputSateOld != u8KeyInputSate)
 	{
 		u16KeyPress = 0;
 		u8KeyInputSateOld = u8KeyInputSate;
 	}
-
 	while(u8AdcTrig1ms < 10)
 	{
 		HAL_IWDG_Refresh(&hiwdg);
 	}
-
 	u8AdcTrig1ms = 0;
 	HAL_ADC_Start_DMA(&hadc1, (u32*)&u32aResultDMA, AD_CH_NUM); //
 	u16AdValueKey = (uint16_t)u32aResultDMA[0];
@@ -78,7 +74,7 @@ void PowUpKeyInputState(void)
 	{
 		u8KeyInputSate = 1;
 		if(++u16KeyPress < 100)
-		{//持续1秒进入IAP
+		{//鎸佺画1绉掕繘鍏AP
 			HAL_IWDG_Refresh(&hiwdg);
 			goto READ_KEY_AD;
 		}
