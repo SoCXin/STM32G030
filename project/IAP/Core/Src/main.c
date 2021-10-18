@@ -88,9 +88,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 }
 
 #define BUFFER_SIZE    14
-//0xA001:0xf549
-
-uint16_t uwExpectedCRCValue = 0xCB91;
+// 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
+// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
+uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 __IO uint16_t uwCRCValue = 0;
 
 static const uint8_t aDataBuffer[BUFFER_SIZE] =
@@ -333,11 +333,11 @@ static void MX_CRC_Init(void)
   /* USER CODE END CRC_Init 1 */
   hcrc.Instance = CRC;
   hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE;
-  hcrc.Init.GeneratingPolynomial = 0x8005;
+  hcrc.Init.GeneratingPolynomial = 0x8005; //0x8005 //0xA001;
   hcrc.Init.CRCLength = CRC_POLYLENGTH_16B;
   hcrc.Init.InitValue = 0xFFFF;
   hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE;
-  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_BYTE;
+  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
   hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE;
   hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
   if (HAL_CRC_Init(&hcrc) != HAL_OK)

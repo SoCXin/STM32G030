@@ -11,13 +11,6 @@ extern "C" {
 #include "stm32g0xx_ll_system.h"
 
 
-
-/*
-***********************************************
-*data type Define
-***********************************************
-*/
-
 //typedef unsigned char  	u8;		// 无符号8位数
 //typedef signed   char  	s8;		// 有符号8位数
 //typedef unsigned short 	u16;	// 无符号16位数
@@ -52,7 +45,7 @@ typedef struct
 	u8  bit7	:1;
 } BYTE_FIELD;
 //===============================================
-typedef union 
+typedef union
 {	u8 byte;
 	BYTE_FIELD 	bitn;
 } TYPE_BYTE_BIT;
@@ -77,7 +70,7 @@ typedef struct
 	u8  bit7	:1;
 } WORD_FIELD;
 //===============================================
-typedef union 
+typedef union
 {
 	u16     word;
 	u8	    byte[2];
@@ -85,14 +78,14 @@ typedef union
 } TYPE_WORD_BIT;
 
 
-typedef union 
+typedef union
 {
 	u16 word;
 	struct my_byte_t
 	{
 		u8 l;
-		u8 h;		
-	}byte;	
+		u8 h;
+	}byte;
 }WORD_BYTE;
 
 typedef struct
@@ -109,7 +102,7 @@ typedef struct
 }tClockSet;
 
 
-typedef union 
+typedef union
 {
 	u8 array[4];
 	float F;
@@ -122,8 +115,8 @@ typedef struct
 	Union_Array_Float LastError2;
 }STRUCT_PID;
 
- 
- #ifdef __cplusplus
+
+#ifdef __cplusplus
 }
 #endif
 
