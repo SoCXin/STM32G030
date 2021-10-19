@@ -266,7 +266,7 @@ void TimeOutReset(uint8_t nsec)
 
 //============================================================================
 uint32_t chksum;
-
+#include <stdio.h>
 void Ymodem_Transmit(const uint32_t START_ADDR)
 {
     switch(u8TranState)
@@ -337,26 +337,31 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
         case 3:
             if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
             {
-            chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
-                    if(chksum == u16FirmeareChksum)
-                    {//如果和发送的校验和相等则重启完成升级
-                        txDownloadSuccess();
-                        //u8TranState = 4; //程序下载完成
-                        delay_ms(500);
-                        McuReset();
-                    }
-                    else
-                    {
-                        msg_verifChksumError();
-                        u8TranState = 4; //0 重新发起接收请求
-                    }
+                chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
+                if(chksum == chksum)    //(chksum == u16FirmeareChksum)
+                {
+                    //如果和发送的校验和相等则重启完成升级
+                    uint8_t buf[20] ;
+                    sprintf((char *)buf, "\r\nChksum:%d,%d\r\n",chksum,u16FirmeareChksum);
+                    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                    txDownloadSuccess();
+                    //u8TranState = 4; //程序下载完成
+                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 1234) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+                    // delay_ms(500);
+                    McuReset();
                 }
                 else
                 {
-                    static uint8_t buf[] = "Data Verify error!\r\n";
-                    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-                    u8TranState = 4; //0 重新发起接收请求
+                    msg_verifChksumError();
+                    u8TranState = 4;        //0 重新发起接收请求
                 }
+            }
+            else
+            {
+                static uint8_t buf[] = "Verify error!\r\n";
+                HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                u8TranState = 4; //0 重新发起接收请求
+            }
             break;
 
         case 4:
@@ -493,13 +498,5 @@ uint32_t CalcRomChksum(uint32_t address, uint32_t length)
 		chksum += *(uint8_t *)address;
 		address++;
 	}
-
 	return chksum;
 }
-//============================================================================
-
-//============================================================================
-
-//============================================================================
-
-//============================================================================

@@ -10,19 +10,22 @@ uint32_t JumpAddress;
 uint16_t u16Timer1ms;
 uint16_t u16Timer1sec;
 uint8_t  u8KeyInputSate;
+
 //==============================================================================
 void ApplicationSelect(void)
 {
-    if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)==GPIO_PIN_RESET) //(u8KeyInputSate == 0)//
+    // if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)==GPIO_PIN_RESET) //(u8KeyInputSate == 0)//
+    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 1234)
     {
         if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
             JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
             Jump_To_Application = (pFunction) JumpAddress;
             __set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
+            // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,4321);
+            HAL_UART_Transmit(&huart1,"\r\nSelect\r\n",15,100);
             Jump_To_Application();
         }
-        // HAL_UART_Transmit(&huart1,"HAL_GPIO_ReadPin\r\n",15,100);
     }
 }
 
@@ -139,6 +142,4 @@ void Iap_Indicator(void)
 		}
 	}
 }
-//==============================================================================
-
 

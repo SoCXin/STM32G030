@@ -53,6 +53,8 @@ CRC_HandleTypeDef hcrc;
 
 IWDG_HandleTypeDef hiwdg;
 
+RTC_HandleTypeDef hrtc;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -72,6 +74,7 @@ static void MX_IWDG_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_DMA_Init(void);
 static void MX_CRC_Init(void);
+static void MX_RTC_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -177,24 +180,33 @@ int main(void)
   MX_USART1_UART_Init();
   MX_DMA_Init();
   MX_CRC_Init();
+  MX_RTC_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
-	uint8_t buf[] = "\r\nSTM32G030 UART1(115200) Bootloader V1.0\r\n";
+
+  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT V1.0\r\n";
 	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-
-
+#ifdef APP
+	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP V1.0\r\n";
+	HAL_UART_Transmit(&huart1,buff,sizeof(buff)-1,100);
+#endif
+//#ifdef BLT
+//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+  ApplicationSelect();
+//#endif
+	// uint8_t buff[] = "\r\nSTM32G030 APP V1.0\r\n";
+	// HAL_UART_Transmit(&huart1,buff,sizeof(buf)-1,100);
   // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)
   // {
   //   aADCxConvertedData[tmp_index_adc_converted_data] = VAR_CONVERTED_DATA_INIT_VALUE;
   // }
-    if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK)
-    {
-      // Error_Handler();
-    }
+//    if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK)
+//    {
+//      // Error_Handler();
+//    }
     // FlashTestWR();
     // HAL_ADC_Start_IT(&hadc1);
     // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData, 8);
@@ -215,12 +227,14 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_IWDG_Refresh(&hiwdg);
+#ifdef BLT
     Ymodem_Transmit(USER_APP_ADDRESS);
-    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
-    {
-      uint8_t temp_buf[] = "erase get.\r\n";
-      HAL_UART_Transmit(&huart1,temp_buf,sizeof(temp_buf)-1,10);
-    }
+#endif
+//    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
+//    {
+//      uint8_t temp_buf[] = "erase get.\r\n";
+//      HAL_UART_Transmit(&huart1,temp_buf,sizeof(temp_buf)-1,10);
+//    }
     // if(key_flag)
     // {
     //   if(key_flag==1)	HAL_UART_Transmit(&huart1,"key1 down\r\n",15,100);
@@ -236,8 +250,8 @@ int main(void)
     // }
     // HAL_ADC_Start(&hadc1);
     // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData,4);
-    // HAL_Delay(500);
-    // ApplicationSelect();
+
+
     // for(uint8_t i=0;i<4;i++)
     // {
     //     HAL_ADC_Start(&hadc1);
@@ -252,10 +266,13 @@ int main(void)
 
     // VrefData = __LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[3],ADC_RESOLUTION_12B);
     // Tempruate=__HAL_ADC_CALC_TEMPERATURE(VrefData,aADCxConvertedData[2],ADC_RESOLUTION_12B);
-
-    // memset((char *)buf,0,sizeof(buf));
-    // sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
-    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
+#ifdef APP
+    HAL_Delay(500);
+		HAL_UART_Transmit(&huart1,"appv1\r\n",15,100);
+#endif
+//    memset((char *)buf,0,sizeof(buf));
+//    sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
+//    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 
     // if (tmp_index_adc_converted_data%1000 == 0)
     // {
@@ -319,9 +336,12 @@ void SystemClock_Config(void)
   }
   /** Initializes the peripherals clocks
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_ADC;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART1
+                              |RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -481,6 +501,42 @@ static void MX_IWDG_Init(void)
   /* USER CODE BEGIN IWDG_Init 2 */
 
   /* USER CODE END IWDG_Init 2 */
+
+}
+
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  hrtc.Init.OutPutPullUp = RTC_OUTPUT_PULLUP_NONE;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
 
 }
 
