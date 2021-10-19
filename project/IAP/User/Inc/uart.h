@@ -4,9 +4,9 @@
   * @brief          : uart head file
   ******************************************************************************
  */
- 
-#ifndef __FLASH_H
-#define __FLASH_H
+
+#ifndef __UART_H
+#define __UART_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,19 +15,22 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
 #include "stm32g0xx_ll_system.h"
-#include "data_type.h"
+
+#define UART1BUF_SIZE 1029
 
 
-#define FLASH_MARK_BASE  USER_APP_ADDRESS - 0x10
+extern uint8_t  u8Uart1RxBuf;
+extern uint16_t u16Uart1RxIndex;
+extern uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 
-#define FLASH_WAITETIME  1000
+extern uint8_t  u8CntUart1Timer1ms;
 
 
-u8  FlashPageRead(u32 address, u8 *pbuf);
-u8  FlashPageWrite(u32 address, u8 *pbuf);
-void FlashTestWR(void);
- 
- #ifdef __cplusplus
+void Uart1Receive_TimerOut(void);
+void ClrUartRxBuf(void);
+void uart_init(void);
+
+#ifdef __cplusplus
 }
 #endif
 

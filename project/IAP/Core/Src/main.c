@@ -25,6 +25,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "data_type.h"
+#include "uart.h"
+#include "bootloader.h"
+#include "flash.h"
+#include "ymodem.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,21 +79,32 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_SYSTICK_Callback(void)
+{
+	PowerUpCounter();
+	Uart1Receive_TimerOut();
+	Wait10msCountDwn();
+	ms_count_down();
+	Iap_Indicator();
+  tmp_index_adc_converted_data++;
+}
+
 uint8_t key_flag=0;
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
-{
-    if(GPIO_Pin == KEY1_Pin)
-    {
-      key_flag=2;
-    }
-}
-void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
-{
-    if(GPIO_Pin == KEY1_Pin)
-    {
-      key_flag=1;
-    }
-}
+// void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+// {
+//     if(GPIO_Pin == KEY1_Pin)
+//     {
+//       key_flag=2;
+//     }
+// }
+// void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
+// {
+//     if(GPIO_Pin == KEY1_Pin)
+//     {
+//       key_flag=1;
+//     }
+// }
+
 // ADC_DMAConvCplt
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 {
@@ -102,6 +117,18 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 
   // HAL_GPIO_WritePin (GPIOF,GPIO_PIN_6,GPIO_PIN_SET );
 }
+// uint8_t  u8Uart1RxBuf;
+// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
+// {
+// 	if(uartHandle == &huart1)
+// 	{
+// 		__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
+// 		__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+// 		__HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+// 		HAL_UART_Transmit(&huart1,&u8Uart1RxBuf,1,100);
+//     HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+// 	}
+// }
 //#define BUFFER_SIZE    14
 // 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
 // width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
@@ -154,6 +181,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  uart_init();
 	uint8_t buf[] = "\r\nSTM32G030 UART1(115200) Bootloader V1.0\r\n";
 	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
@@ -167,7 +195,7 @@ int main(void)
     {
       // Error_Handler();
     }
-
+    // FlashTestWR();
     // HAL_ADC_Start_IT(&hadc1);
     // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData, 8);
 		// HAL_Delay(500);
@@ -187,13 +215,19 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_IWDG_Refresh(&hiwdg);
-    if(key_flag)
+    Ymodem_Transmit(USER_APP_ADDRESS);
+    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
     {
-      if(key_flag==1)	HAL_UART_Transmit(&huart1,"key1 down\r\n",15,100);
-      else if(key_flag==2)	HAL_UART_Transmit(&huart1,"key1 up\r\n",15,100);
-      // HAL_Delay(100);
-      key_flag=0;
+      uint8_t temp_buf[] = "erase get.\r\n";
+      HAL_UART_Transmit(&huart1,temp_buf,sizeof(temp_buf)-1,10);
     }
+    // if(key_flag)
+    // {
+    //   if(key_flag==1)	HAL_UART_Transmit(&huart1,"key1 down\r\n",15,100);
+    //   else if(key_flag==2)	HAL_UART_Transmit(&huart1,"key1 up\r\n",15,100);
+    //   // HAL_Delay(100);
+    //   key_flag=0;
+    // }
     // uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
     // if (uwCRCValue != uwExpectedCRCValue)
     // {
@@ -201,8 +235,9 @@ int main(void)
     //   HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
     // }
     // HAL_ADC_Start(&hadc1);
-    HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData,4);
-    HAL_Delay(500);
+    // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData,4);
+    // HAL_Delay(500);
+    // ApplicationSelect();
     // for(uint8_t i=0;i<4;i++)
     // {
     //     HAL_ADC_Start(&hadc1);
@@ -215,23 +250,23 @@ int main(void)
     // HAL_ADC_PollForConversion(&hadc1,0xffff);//等待ADC转换完成
     // aADCxConvertedData[0]=HAL_ADC_GetValue(&hadc1);
 
-    VrefData = __LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[3],ADC_RESOLUTION_12B);
-    Tempruate=__HAL_ADC_CALC_TEMPERATURE(VrefData,aADCxConvertedData[2],ADC_RESOLUTION_12B);
+    // VrefData = __LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[3],ADC_RESOLUTION_12B);
+    // Tempruate=__HAL_ADC_CALC_TEMPERATURE(VrefData,aADCxConvertedData[2],ADC_RESOLUTION_12B);
 
-    memset((char *)buf,0,sizeof(buf));
-    sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
-    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
+    // memset((char *)buf,0,sizeof(buf));
+    // sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
+    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 
-    // if (ubDmaTransferStatus == 1)
+    // if (tmp_index_adc_converted_data%1000 == 0)
     // {
-    //   VrefData=__LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[2],ADC_RESOLUTION_12B);
+    //   // VrefData=__LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[2],ADC_RESOLUTION_12B);
     //   // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)
     //   // {
     //   //   aADCxConvertedData[tmp_index_adc_converted_data] = VAR_CONVERTED_DATA_INIT_VALUE;
     //   // }
-    //   ubDmaTransferStatus = 0;
+    //   // ubDmaTransferStatus = 0;
     //   memset((char *)buf,0,sizeof(buf));
-    //   sprintf((char *)buf, "ADC:%d,%d,%d,%d\r\n",aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
+    //   sprintf((char *)buf, "ADC,%d:%d,%d,%d,%d\r\n",tmp_index_adc_converted_data,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
     //   HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
     // }
     // HAL_ADC_Start(&hadc1);

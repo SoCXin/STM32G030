@@ -1,11 +1,5 @@
-/**
-  ******************************************************************************
-  * @file           : uart.c
-  * @brief          : uart sub program body
-  ******************************************************************************
- */
 
-#include "user.h"
+#include "main.h"
 #include "bootloader.h"
 #include "flash.h"
 #include "ymodem.h"

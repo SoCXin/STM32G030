@@ -1,9 +1,9 @@
 /*******************************************************************************
   * @file    ymodem_daxia.c
-  * @author  
+  * @author
   * @version V2.0.2
   * @date    2020.11.02
-  * @brief   Y-Modem Ğ­ÒéÎÄ¼ş½ÓÊÕ
+  * @brief   Y-Modem åè®®æ–‡ä»¶æ¥æ”¶
   *****************************************************************************/
 #include "main.h"
 #include "bootloader.h"
@@ -23,11 +23,11 @@ uint16_t Y_Modem_CRC(uint8_t * buf, uint16_t len)
     uint16_t stat;
     uint16_t i;
     uint8_t * in_ptr;
-   
-    //Ö¸ÏòÒª¼ÆËãCRCµÄ»º³åÇø¿ªÍ·
+
+    //æŒ‡å‘è¦è®¡ç®—CRCçš„ç¼“å†²åŒºå¼€å¤´
     in_ptr = buf;
     chsum = 0;
-    for (stat = len ; stat > 0; stat--) //lenÊÇËùÒª¼ÆËãµÄ³¤¶È
+    for (stat = len ; stat > 0; stat--) //lenæ˜¯æ‰€è¦è®¡ç®—çš„é•¿åº¦
     {
         chsum = chsum^(uint16_t)(*in_ptr++) << 8;
         for (i=8; i!=0; i--) {
@@ -128,26 +128,26 @@ volatile uint32_t u16FirmeareChksum;
 uint8_t  u8Program1K;
 uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 {
-  	
+
   uint16_t len;
   uint16_t temp;
   uint16_t i;
   uint8_t  state = 0;
-  
+
   if((u8UartRxBuf[0] == MODEM_SOH) || (u8UartRxBuf[0] == MODEM_STX))
   {
     len = TAB_YMODE_LEN[u8UartRxBuf[0] - 1] + 5;
     if(u16Uart1RxIndex >= len)
     {
       u16Uart1RxIndex = 0;
-            
+
       if((u8UartRxBuf[1] + u8UartRxBuf[2]) == 0xff)
       {
         if((u8EndState == 2) && (u8UartRxBuf[1] == 0))
         {
-          state = 1;		  
+          state = 1;
           Send_CMD(MODEM_ACK);
-        }   
+        }
         else
         {
           temp = u8UartRxBuf[len-2];
@@ -158,33 +158,33 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
           if(temp == chk_crc) //Y_Modem_CRC(&u8UartRxBuf[3], len-5))
           {
             if(u8TranState == 2)
-            {							
+            {
 							uint32_t u32ProgramSize;
-							u32ProgramSize = PragamerAddr - START_ADDR;			
+							u32ProgramSize = PragamerAddr - START_ADDR;
 							if(u16FirmeareSize > u32ProgramSize)
 							{
 								if((u16FirmeareSize - u32ProgramSize) >= FLASH_PAGE_SIZE)
-								{//´óÓÚµÈÓÚ2K
+								{//å¤§äºç­‰äº2K
 									for(i=0; i<(len - 5); i++)
 									{
 										FlashWriteBuf[(len-5) * u8CntRxFlame + i] = u8UartRxBuf[3+i];
 									}
-									
+
 									if(++u8CntRxFlame >= FLASH_PAGE_SIZE / (len - 5))
 									{
-										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test										
-										FlashPageWrite(PragamerAddr, FlashWriteBuf);									
-										u16CntFlashPage++;	
+										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test
+										FlashPageWrite(PragamerAddr, FlashWriteBuf);
+										u16CntFlashPage++;
 										PragamerAddr += FLASH_PAGE_SIZE;
-										u8CntRxFlame = 0;										
-									}			
+										u8CntRxFlame = 0;
+									}
 								}
-								else 
-								{//Ğ¡ÓÚ2K
+								else
+								{//å°äº2K
 									if(u8Program1K == 0)
 									{
 										if((u16FirmeareSize - u32ProgramSize) >= 1024)
-										{//1K~2K										
+										{//1K~2K
 											for(i=0; i<1024; i++)
 											{
 												FlashWriteBuf[i] = u8UartRxBuf[3+i];
@@ -192,7 +192,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 											u8Program1K = 1;
 										}
 										else
-										{//<1K	
+										{//<1K
 											for(i=0; i<1024; i++)
 											{
 												FlashWriteBuf[i] = u8UartRxBuf[3+i];
@@ -200,49 +200,49 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 											//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test
 											FlashPageWrite(PragamerAddr, FlashWriteBuf);
 										}
-									}		
+									}
 									else if(u8Program1K == 1)
 									{
 										for(i=0; i<1024; i++)
 										{
-											FlashWriteBuf[1024 + i] = u8UartRxBuf[3+i];											
-										}	
+											FlashWriteBuf[1024 + i] = u8UartRxBuf[3+i];
+										}
 										//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(Led1_GPIO_Port, Led1_Pin);test
-										FlashPageWrite(PragamerAddr, FlashWriteBuf); 
-									}										
+										FlashPageWrite(PragamerAddr, FlashWriteBuf);
+									}
 								}
 							}
             }
-                     
+
             state = 1;
           }
           else
           {
-            Send_CMD(MODEM_NAK); //½ÓÊÕ·½crcĞ£Ñé³ö´í,ÖØ´«µ±Ç°Êı¾İ°üÇëÇó
+            Send_CMD(MODEM_NAK); //æ¥æ”¶æ–¹crcæ ¡éªŒå‡ºé”™,é‡ä¼ å½“å‰æ•°æ®åŒ…è¯·æ±‚
           }
         }
-               
+
         u16Wait10ms = 25;
       }
     }
   }
   else if(u8UartRxBuf[0] == MODEM_EOT)
-  {//½ÓÊÕµ½´«ÊäÍê³É£¬·¢ËÍNAKºÍACKÓ¦´ğ
+  {//æ¥æ”¶åˆ°ä¼ è¾“å®Œæˆï¼Œå‘é€NAKå’ŒACKåº”ç­”
     if(u8EndState == 0)
-    {      
+    {
       Send_CMD(MODEM_NAK);
-			
+
       u8EndState = 1;
     }
     else if(u8EndState == 1)
-    {            
+    {
       Send_CMD(MODEM_ACK);
       delay_ms(2);
       //Send_CMD(MODEM_C);
       u8EndState = 2;
     }
   }
-    
+
   return state;
 }
 //============================================================================
@@ -250,9 +250,9 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 //============================================================================
 void McuReset(void)
 {
-	// ¹Ø±ÕËùÓĞÖĞ¶Ï
-	__disable_irq();//__set_FAULTMASK(1);//__set_FAULTMASK(1); //Ö´ĞĞNVIC_SystemReset()º¯Êı²»ÔÊĞí±»´ò¶Ï£¬ËùÒÔ¹Ø×ÜÖĞ¶Ï
-	// ¸´Î»
+	// å…³é—­æ‰€æœ‰ä¸­æ–­
+	__disable_irq();//__set_FAULTMASK(1);//__set_FAULTMASK(1); //æ‰§è¡ŒNVIC_SystemReset()å‡½æ•°ä¸å…è®¸è¢«æ‰“æ–­ï¼Œæ‰€ä»¥å…³æ€»ä¸­æ–­
+	// å¤ä½
 	NVIC_SystemReset();
 }
 //============================================================================
@@ -277,7 +277,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
 {
   switch(u8TranState)
   {
-    case 0:      
+    case 0:
       u16Uart1RxIndex = 0;
       u8YmodeType = 0;
       u8EndState = 0;
@@ -288,20 +288,20 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
       u16Wait10ms = 25;
       u8TranState = 1;
     break;
-    
+
     case 1:
       if(u16Wait10ms)
       {
         if(YmodemReceiveDate(START_ADDR))
         {
           if(u8UartRxBuf[1] == 0x00)
-          {//Ê×Ö¡Êı¾İ°üº¬ÎÄ¼şÃû¼°Êı¾İ´óĞ¡
+          {//é¦–å¸§æ•°æ®åŒ…å«æ–‡ä»¶ååŠæ•°æ®å¤§å°
             Send_CMD(MODEM_ACK);
             delay_ms(2);
             Send_CMD(MODEM_C);
-            
+
 			u16FirmeareSize = GetFirmwareSize(u8UartRxBuf);
-			u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);			
+			u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);
             PragamerAddr = START_ADDR;
 						u8Program1K = 0;
 						u8TranState = 2;
@@ -311,26 +311,26 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
       }
       else
       {
-        u8TranState = 0; //³¬Ê±¼ÌĞø·¢ËÍ¡°C¡±µÈ´ı½ÓÊÕÎÄ¼ş
-      }      
+        u8TranState = 0; //è¶…æ—¶ç»§ç»­å‘é€â€œCâ€ç­‰å¾…æ¥æ”¶æ–‡ä»¶
+      }
     break;
-    
-    case 2:           
+
+    case 2:
       if(u16Wait10ms)
       {
         if(YmodemReceiveDate(START_ADDR))
         {
           Send_CMD(MODEM_ACK);
 					u8TimeOut250ms = 0;
-        }  				
+        }
       }
-      else 
+      else
       {
         if(u8EndState < 2)
         {
-          u16Uart1RxIndex = 0; //½ÓÊÕ³¬Ê±£¬½ÓÊÕ¼ÆÊıÇå0
+          u16Uart1RxIndex = 0; //æ¥æ”¶è¶…æ—¶ï¼Œæ¥æ”¶è®¡æ•°æ¸…0
           u16Wait10ms = 25;
-          Send_CMD(MODEM_NAK); //ÖØ´«µ±Ç°Êı¾İ°üÇëÇó
+          Send_CMD(MODEM_NAK); //é‡ä¼ å½“å‰æ•°æ®åŒ…è¯·æ±‚
 					TimeOutReset(10);
         }
         else
@@ -338,40 +338,40 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
 					msg_enter();
           u8TranState = 3;
         }
-      }        
+      }
     break;
-    
-    case 3:   
+
+    case 3:
 			if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
-			{		
+			{
         chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
 				if(chksum == u16FirmeareChksum)
-				{//Èç¹ûºÍ·¢ËÍµÄĞ£ÑéºÍÏàµÈÔòÖØÆôÍê³ÉÉı¼¶					
+				{//å¦‚æœå’Œå‘é€çš„æ ¡éªŒå’Œç›¸ç­‰åˆ™é‡å¯å®Œæˆå‡çº§
 					txDownloadSuccess();
-					//u8TranState = 4; //³ÌĞòÏÂÔØÍê³É
+					//u8TranState = 4; //ç¨‹åºä¸‹è½½å®Œæˆ
 					delay_ms(500);
 					McuReset();
 				}
 				else
 				{
 					msg_verifChksumError();
-					u8TranState = 4; //0 ÖØĞÂ·¢Æğ½ÓÊÕÇëÇó
+					u8TranState = 4; //0 é‡æ–°å‘èµ·æ¥æ”¶è¯·æ±‚
 				}
 			}
 			else
 			{
 				static uint8_t buf[] = "Data Verify error!\r\n";
 				HAL_UART_Transmit(&huart2,buf,sizeof(buf)-1,10);
-				u8TranState = 4; //0 ÖØĞÂ·¢Æğ½ÓÊÕÇëÇó
-			}      
+				u8TranState = 4; //0 é‡æ–°å‘èµ·æ¥æ”¶è¯·æ±‚
+			}
     break;
-    
+
     case 4:
-      
+
     break;
-		    
+
     default:
-      
+
     break;
   }
 }
@@ -384,11 +384,11 @@ void Wait10msCountDwn(void)
 	if(++u8Cnt1ms >= 10)
 	{
 		u8Cnt1ms = 0;
-		if(u16Wait10ms) 
+		if(u16Wait10ms)
 		{
-			u16Wait10ms--;	
+			u16Wait10ms--;
 		}
-	}  
+	}
 }
 //============================================================================
 
@@ -409,7 +409,7 @@ uint8_t CharToHex(uint8_t str)
 	{
 		num = str - 0x57;
 	}
-	
+
 	return num;
 }
 //============================================================================
@@ -427,7 +427,7 @@ uint16_t GetRxBufSize(uint8_t *rxbuf)
 	{
 		size = 1024;
 	}
-	
+
 	return size;
 }
 //============================================================================
@@ -451,13 +451,13 @@ uint32_t GetFirmwareSize(uint8_t *rxbuf)
 			get_size /= 10;
 			break;
 		}
-		
+
 		if(rxbuf[i] == 0x00)
 		{
 			index++;
 		}
 	}
-	
+
 	return get_size;
 }
 //============================================================================
@@ -481,13 +481,13 @@ uint32_t GetFirmwareChksum(uint8_t *rxbuf)
 			chksum >>= 4;
 			break;
 		}
-		
+
 		if(rxbuf[i] == 0x00)
 		{
 			index++;
 		}
 	}
-	
+
 	return chksum;
 }
 //============================================================================
@@ -502,7 +502,7 @@ uint32_t CalcRomChksum(uint32_t address, uint32_t length)
 		chksum += *(uint8_t *)address;
 		address++;
 	}
-	
+
 	return chksum;
 }
 //============================================================================

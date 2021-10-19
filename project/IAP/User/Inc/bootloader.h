@@ -11,7 +11,7 @@ extern "C" {
 #include "data_type.h"
 
 #define FLASH_START_BASE    0x08000000
-#define USER_APP_ADDRESS    0x8004000
+#define USER_APP_ADDRESS    0x08004000
 #define APP_START_PAGE      ((USER_APP_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
 
 

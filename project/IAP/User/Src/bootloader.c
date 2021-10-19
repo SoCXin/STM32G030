@@ -1,4 +1,4 @@
-#include "user.h"
+#include "main.h"
 #include "string.h"
 #include "bootloader.h"
 #include "ymodem.h"
@@ -13,17 +13,17 @@ uint8_t  u8KeyInputSate;
 //==============================================================================
 void ApplicationSelect(void)
 {
-	if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)) //(u8KeyInputSate == 0)//
-	{//如果上电没有按键执行用户代码
-		if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
-		{
-			JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
-			Jump_To_Application = (pFunction) JumpAddress;
-			//初始化用户程序的堆栈指针
-			__set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
-			Jump_To_Application();
-		}
-	}
+    if(HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin)==GPIO_PIN_RESET) //(u8KeyInputSate == 0)//
+    {
+        if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        {
+            JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
+            Jump_To_Application = (pFunction) JumpAddress;
+            __set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
+            Jump_To_Application();
+        }
+        // HAL_UART_Transmit(&huart1,"HAL_GPIO_ReadPin\r\n",15,100);
+    }
 }
 
 //==============================================================================
@@ -67,14 +67,14 @@ void PowUpKeyInputState(void)
 		HAL_IWDG_Refresh(&hiwdg);
 	}
 	u8AdcTrig1ms = 0;
-	HAL_ADC_Start_DMA(&hadc1, (u32*)&u32aResultDMA, AD_CH_NUM); //
-	u16AdValueKey = (uint16_t)u32aResultDMA[0];
+	// HAL_ADC_Start_DMA(&hadc1, (u32*)&u32aResultDMA, AD_CH_NUM); //
+	// u16AdValueKey = (uint16_t)u32aResultDMA[0];
 
 	if(u16AdValueKey >= 800 && u16AdValueKey <= 950)
 	{
 		u8KeyInputSate = 1;
 		if(++u16KeyPress < 100)
-		{//持续1秒进入IAP
+		{
 			HAL_IWDG_Refresh(&hiwdg);
 			goto READ_KEY_AD;
 		}
@@ -104,7 +104,6 @@ void Iap_Indicator(void)
 	{
 		return;
 	}
-
 	if(u8TranState <= 1)
 	{
 		u8Cnt5HzDelay = 0;
