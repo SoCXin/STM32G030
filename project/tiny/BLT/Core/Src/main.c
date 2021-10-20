@@ -122,9 +122,9 @@ int main(void)
   MX_USART1_UART_Init();
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
-//  HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+	LL_USART_EnableIT_RXNE(USART1);
+	LL_USART_EnableIT_PE(USART1);
   uint8_t buf[] = "\r\nSTM32G030 UART1(115200) TEST\r\n";
-	// HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
   for(uint8_t i=0;i<sizeof(buf)-1;i++)
   {
     LL_USART_TransmitData8(USART1, buf[i]);
