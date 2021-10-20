@@ -144,7 +144,7 @@ int main(void)
     LL_mDelay(500);
     memset((char *)buf,0,sizeof(buf));
     uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
-    sprintf((char *)buf, "CRC:%x\r\n",uwCRCValue);
+    sprintf((char *)buf, "CRC:%x\r\n",(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
     // HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
     for(uint8_t i=0;i<strlen((char *)buf);i++)
     {
@@ -359,6 +359,8 @@ static void MX_USART1_UART_Init(void)
   LL_USART_SetTXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
   LL_USART_SetRXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
   LL_USART_DisableFIFO(USART1);
+  LL_USART_EnableAutoBaudRate(USART1);
+  LL_USART_SetAutoBaudRateMode(USART1, LL_USART_AUTOBAUD_DETECT_ON_STARTBIT);
   LL_USART_ConfigAsyncMode(USART1);
 
   /* USER CODE BEGIN WKUPType USART1 */

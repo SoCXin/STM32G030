@@ -162,11 +162,11 @@ void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
 	uint8_t tmp;
-	if(LL_USART_IsActiveFlag_RXNE(USART1)) //检测是否接收中断
+	if(LL_USART_IsActiveFlag_RXNE(USART1)) //�?测是否接收中�?
 	{
 		LL_GPIO_ResetOutputPin(GPIOA,LL_GPIO_PIN_5);
 		tmp=LL_USART_ReceiveData8(USART1);   //读取出来接收到的数据
-		LL_USART_TransmitData8(USART1,tmp);  //把数据再从串口发送出去
+		LL_USART_TransmitData8(USART1,tmp);  //把数据再从串口发送出�?
 	}
   /* USER CODE END USART1_IRQn 0 */
   /* USER CODE BEGIN USART1_IRQn 1 */
