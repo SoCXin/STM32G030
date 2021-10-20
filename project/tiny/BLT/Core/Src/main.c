@@ -77,6 +77,7 @@ static void MX_CRC_Init(void);
 uint8_t u8Uart1RxBuf;
 uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 __IO uint16_t uwCRCValue = 0;
+__IO uint16_t testa = 0;
 #define BUFFER_SIZE    14
 static const uint8_t aDataBuffer[BUFFER_SIZE] =
 {
@@ -127,10 +128,13 @@ int main(void)
   uint8_t buf[] = "\r\nSTM32G030 UART1(115200) TEST\r\n";
   for(uint8_t i=0;i<sizeof(buf)-1;i++)
   {
-    LL_USART_TransmitData8(USART1, buf[i]);
+    LL_USART_TransmitData9(USART1, buf[i]);
     while(!LL_USART_IsActiveFlag_TXE(USART1));
   }
-
+  for(uint8_t i=0;i<BUFFER_SIZE;i++)
+  {
+    testa = HAL_CRC_Accumulate(&hcrc, (uint32_t *)&aDataBuffer[i], 1);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -144,7 +148,7 @@ int main(void)
     LL_mDelay(500);
     memset((char *)buf,0,sizeof(buf));
     uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
-    sprintf((char *)buf, "CRC:%x\r\n",(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
+    sprintf((char *)buf, "CRC:%x,%x\r\n",testa,(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
     // HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
     for(uint8_t i=0;i<strlen((char *)buf);i++)
     {
