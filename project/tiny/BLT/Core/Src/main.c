@@ -41,29 +41,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-CRC_HandleTypeDef hcrc;
 
 /* USER CODE BEGIN PV */
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
-//{
-//    if(uartHandle == &huart1)
-//    {
-//        // __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
-//        // __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-//        // __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-//        // // test= huart1.Instance->RDR;
-//        // // HAL_UART_Transmit(&huart1,&test,1,100);
-//        // if(u16Uart1RxIndex >= UART1BUF_SIZE)
-//        // {
-//        //     u16Uart1RxIndex = 0;
-//        // }
-//        // u8UartRxBuf[u16Uart1RxIndex] = huart1.Instance->RDR;
-//        // u16Uart1RxIndex++;
-//        // Uart1Rxing = 1;
-//        // u8CntUart1Timer1ms = 0;
-//        // HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
-//    }
-//}
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,6 +65,7 @@ static const uint8_t aDataBuffer[BUFFER_SIZE] =
 };
 
 __IO uint32_t tmp_index = 0;
+
 void HAL_SYSTICK_Callback(void)
 {
   tmp_index++;
@@ -94,6 +75,121 @@ void HAL_SYSTICK_Callback(void)
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // Program Size: Code=7136 RO-data=352 RW-data=20 ZI-data=1908
+
+uint8_t  u8YmodeType; //SOH(128) or STX(1024)
+uint8_t  u8TranState;
+uint16_t u16Wait10ms;
+uint16_t u16CntFlashPage;
+uint32_t chksum;
+#define FLASH_START_BASE    0x08000000
+#define USER_APP_ADDRESS    0x08004000
+#define APP_START_PAGE      ((USER_APP_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
+
+// void Ymodem_loop(void)
+// {
+//     uint32_t START_ADDR= USER_APP_ADDRESS;
+//     switch(u8TranState)
+//     {
+//         case 0:
+//             u16Uart1RxIndex = 0;
+//             u8YmodeType = 0;
+//             u8EndState = 0;
+//             u16CntFlashPage = 0;
+//             u8CntRxFlame = 0;
+//             ClrUartRxBuf();
+//             Send_CMD(MODEM_C);
+//             u16Wait10ms = 25;
+//             u8TranState = 1;
+//             break;
+//         case 1:
+//             if(u16Wait10ms)
+//             {
+//                 if(YmodemReceiveDate(START_ADDR))
+//                 {
+//                     if(u8UartRxBuf[1] == 0x00)
+//                     {
+//                         Send_CMD(MODEM_ACK);
+//                         delay_ms(2);
+//                         Send_CMD(MODEM_C);
+//                         u16FirmeareSize = GetFirmwareSize(u8UartRxBuf);
+//                         u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);
+//                         PragamerAddr = START_ADDR;
+//                         u8Program1K = 0;
+//                         u8TranState = 2;
+//                         u16Wait10ms = 25;
+//                     }
+//                 }
+//             }
+//             else
+//             {
+//                 u8TranState = 0;
+//             }
+//             break;
+
+//         case 2:
+//             if(u16Wait10ms)
+//             {
+//                 if(YmodemReceiveDate(START_ADDR))
+//                 {
+//                     Send_CMD(MODEM_ACK);
+//                     u8TimeOut250ms = 0;
+//                 }
+//             }
+//             else
+//             {
+//                 if(u8EndState < 2)
+//                 {
+//                     u16Uart1RxIndex = 0;
+//                     u16Wait10ms = 25;
+//                     Send_CMD(MODEM_NAK);
+//                     TimeOutReset(10);
+//                 }
+//                 else
+//                 {
+//                     msg_enter();
+//                     u8TranState = 3;
+//                 }
+//             }
+//             break;
+
+//         case 3:
+//             if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+//             {
+//                 chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
+//                 if(chksum == chksum)    //(chksum == u16FirmeareChksum)
+//                 {
+//                     //如果和发送的校验和相等则重启完成升级
+//                     uint8_t buf[20] ;
+//                     sprintf((char *)buf, "\r\nChksum:%d,%d\r\n",chksum,u16FirmeareChksum);
+//                     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+//                     txDownloadSuccess();
+//                     //u8TranState = 4; //程序下载完成
+//                     if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 1234) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+//                     // delay_ms(500);
+//                     McuReset();
+//                 }
+//                 else
+//                 {
+//                     msg_verifChksumError();
+//                     u8TranState = 4;        //0 重新发起接收请求
+//                 }
+//             }
+//             else
+//             {
+//                 static uint8_t buf[] = "Verify error!\r\n";
+//                 HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+//                 u8TranState = 4; //0 重新发起接收请求
+//             }
+//             break;
+
+//         case 4:
+//         break;
+
+//         default:
+//         break;
+//     }
+// }
+
 /* USER CODE END 0 */
 
 /**
@@ -109,7 +205,13 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+
+  /* System interrupt init*/
+  /* SysTick_IRQn interrupt configuration */
+  NVIC_SetPriority(SysTick_IRQn, 3);
 
   /* USER CODE BEGIN Init */
 
@@ -139,8 +241,9 @@ int main(void)
   }
   for(uint8_t i=0;i<BUFFER_SIZE;i++)
   {
-    testa = HAL_CRC_Accumulate(&hcrc, (uint32_t *)&aDataBuffer[i], 1);
+    LL_CRC_FeedData8(CRC, aDataBuffer[i]);
   }
+    testa = LL_CRC_ReadData16(CRC);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -153,7 +256,7 @@ int main(void)
     LL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
     LL_mDelay(500);
     memset((char *)buf,0,sizeof(buf));
-    uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
+    // uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
     sprintf((char *)buf, "CRC%d:%x,%x\r\n",tmp_index,testa,(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
     // HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
     for(uint8_t i=0;i<strlen((char *)buf);i++)
@@ -214,14 +317,11 @@ void SystemClock_Config(void)
 
   /* Set APB1 prescaler*/
   LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+
+  LL_Init1msTick(64000000);
+
   /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
   LL_SetSystemCoreClock(64000000);
-
-   /* Update the time base */
-  if (HAL_InitTick (TICK_INT_PRIORITY) != HAL_OK)
-  {
-    Error_Handler();
-  }
   LL_RCC_EnableRTC();
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK1);
 }
@@ -238,22 +338,17 @@ static void MX_CRC_Init(void)
 
   /* USER CODE END CRC_Init 0 */
 
+  /* Peripheral clock enable */
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
+
   /* USER CODE BEGIN CRC_Init 1 */
 
   /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
-  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_DISABLE;
-  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_DISABLE;
-  hcrc.Init.GeneratingPolynomial = 32773;
-  hcrc.Init.CRCLength = CRC_POLYLENGTH_16B;
-  hcrc.Init.InitValue = 0xFFFF;
-  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_BYTE;
-  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE;
-  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_BYTE);
+  LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_BIT);
+  LL_CRC_SetInitialData(CRC, 0xFFFF);
+  LL_CRC_SetPolynomialCoef(CRC, 32773);
+  LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_16B);
   /* USER CODE BEGIN CRC_Init 2 */
 
   /* USER CODE END CRC_Init 2 */
