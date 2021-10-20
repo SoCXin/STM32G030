@@ -527,20 +527,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g0xx_hal_uart.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>28</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32g0xx_hal_uart_ex.c</FilenameWithoutPath>
+      <PathWithFileName>../Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_usart.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g0xx_ll_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -554,7 +542,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>29</FileNumber>
+      <FileNumber>28</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
