@@ -83,6 +83,12 @@ static const uint8_t aDataBuffer[BUFFER_SIZE] =
 {
   0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7, 0x8, 0x9, 0xa, 0xb, 0xc,0xd, 0xe,
 };
+
+__IO uint32_t tmp_index = 0;
+void HAL_SYSTICK_Callback(void)
+{
+  tmp_index++;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -148,7 +154,7 @@ int main(void)
     LL_mDelay(500);
     memset((char *)buf,0,sizeof(buf));
     uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
-    sprintf((char *)buf, "CRC:%x,%x\r\n",testa,(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
+    sprintf((char *)buf, "CRC%d:%x,%x\r\n",tmp_index,testa,(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
     // HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
     for(uint8_t i=0;i<strlen((char *)buf);i++)
     {
