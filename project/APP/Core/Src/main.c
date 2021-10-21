@@ -24,11 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-#include "data_type.h"
-#include "uart.h"
-#include "bootloader.h"
-#include "flash.h"
-#include "ymodem.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,12 +54,7 @@ RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-__IO  uint32_t aADCxData[4];
-__IO  uint16_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
-__IO  uint8_t ubDmaTransferStatus = 0;
-uint32_t Tempruate;
-uint16_t VrefData,VolDta;
-uint32_t tmp_index_adc_converted_data = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,68 +73,6 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_SYSTICK_Callback(void)
-{
-	PowerUpCounter();
-	Uart1Receive_TimerOut();
-	Wait10msCountDwn();
-	ms_count_down();
-	Iap_Indicator();
-  tmp_index_adc_converted_data++;
-}
-
-uint8_t key_flag=0;
-// void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
-// {
-//     if(GPIO_Pin == KEY1_Pin)
-//     {
-//       key_flag=2;
-//     }
-// }
-// void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
-// {
-//     if(GPIO_Pin == KEY1_Pin)
-//     {
-//       key_flag=1;
-//     }
-// }
-
-// ADC_DMAConvCplt
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
-{
-  if(AdcHandle==(&hadc1))
-  {
-    ubDmaTransferStatus ++;
-    // HAL_UART_Transmit(&huart1,"adc\r\n",15,100);
-    // HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-  }
-
-  // HAL_GPIO_WritePin (GPIOF,GPIO_PIN_6,GPIO_PIN_SET );
-}
-// uint8_t  u8Uart1RxBuf;
-// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
-// {
-// 	if(uartHandle == &huart1)
-// 	{
-// 		__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
-// 		__HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-// 		__HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-// 		HAL_UART_Transmit(&huart1,&u8Uart1RxBuf,1,100);
-//     HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
-// 	}
-// }
-//#define BUFFER_SIZE    14
-// 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
-// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
-//uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
-//__IO uint16_t uwCRCValue = 0;
-
-//static const uint8_t aDataBuffer[BUFFER_SIZE] =
-//{
-//  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7,
-//  0x8, 0x9, 0xa, 0xb, 0xc,0xd, 0xe,
-//};
-
 
 /* USER CODE END 0 */
 
@@ -185,37 +114,10 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  uart_init();
-#ifdef APP
+
 	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP V1.0\r\n";
 	HAL_UART_Transmit(&huart1,buff,sizeof(buff)-1,100);
-#endif
-#ifdef BLT
-  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT V1.0\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
-  ApplicationSelect();
-#endif
-	// uint8_t buff[] = "\r\nSTM32G030 APP V1.0\r\n";
-	// HAL_UART_Transmit(&huart1,buff,sizeof(buf)-1,100);
-  // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)
-  // {
-  //   aADCxConvertedData[tmp_index_adc_converted_data] = VAR_CONVERTED_DATA_INIT_VALUE;
-  // }
-//    if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK)
-//    {
-//      // Error_Handler();
-//    }
-    // FlashTestWR();
-    // HAL_ADC_Start_IT(&hadc1);
-    // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData, 8);
-		// HAL_Delay(500);
-		// HAL_IWDG_Refresh(&hiwdg);
-    // memset((char *)buf,0,sizeof(buf));
-    // sprintf((char *)buf, "ADC F:%d,%d,%d,%d\r\n",aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
-    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-    // HAL_ADC_Start_DMA(&hadc1, (u32*)&aADCxConvertedData, 1);
-  // if (HAL_ADC_Start_DMA(&hadc1,(uint32_t *)aADCxConvertedData,ADC_CONVERTED_DATA_BUFFER_SIZE) != HAL_OK);
+  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_4,GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -226,66 +128,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_IWDG_Refresh(&hiwdg);
-#ifdef BLT
-    Ymodem_Transmit(USER_APP_ADDRESS);
-#endif
-//    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
-//    {
-//      uint8_t temp_buf[] = "erase get.\r\n";
-//      HAL_UART_Transmit(&huart1,temp_buf,sizeof(temp_buf)-1,10);
-//    }
-    // if(key_flag)
-    // {
-    //   if(key_flag==1)	HAL_UART_Transmit(&huart1,"key1 down\r\n",15,100);
-    //   else if(key_flag==2)	HAL_UART_Transmit(&huart1,"key1 up\r\n",15,100);
-    //   // HAL_Delay(100);
-    //   key_flag=0;
-    // }
-    // uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
-    // if (uwCRCValue != uwExpectedCRCValue)
-    // {
-    //   sprintf((char *)buf, "CRC:%x\r\n",uwCRCValue);
-    //   HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-    // }
-    // HAL_ADC_Start(&hadc1);
-    // HAL_ADC_Start_DMA(&hadc1, (u32*)aADCxConvertedData,4);
-
-
-    // for(uint8_t i=0;i<4;i++)
-    // {
-    //     HAL_ADC_Start(&hadc1);
-    //     HAL_ADC_PollForConversion(&hadc1,0xffff);//等待ADC转换完成
-    //     aADCxConvertedData[i]=HAL_ADC_GetValue(&hadc1);
-    // }
-    // HAL_ADC_Stop(&hadc1);
-
-    // HAL_ADC_Start(&hadc1);
-    // HAL_ADC_PollForConversion(&hadc1,0xffff);//等待ADC转换完成
-    // aADCxConvertedData[0]=HAL_ADC_GetValue(&hadc1);
-
-    // VrefData = __LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[3],ADC_RESOLUTION_12B);
-    // Tempruate=__HAL_ADC_CALC_TEMPERATURE(VrefData,aADCxConvertedData[2],ADC_RESOLUTION_12B);
-#ifdef APP
     HAL_Delay(500);
-		HAL_UART_Transmit(&huart1,"appv1\r\n",15,100);
-#endif
-//    memset((char *)buf,0,sizeof(buf));
-//    sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
-//    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-
-    // if (tmp_index_adc_converted_data%1000 == 0)
-    // {
-    //   // VrefData=__LL_ADC_CALC_VREFANALOG_VOLTAGE(aADCxConvertedData[2],ADC_RESOLUTION_12B);
-    //   // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)
-    //   // {
-    //   //   aADCxConvertedData[tmp_index_adc_converted_data] = VAR_CONVERTED_DATA_INIT_VALUE;
-    //   // }
-    //   // ubDmaTransferStatus = 0;
-    //   memset((char *)buf,0,sizeof(buf));
-    //   sprintf((char *)buf, "ADC,%d:%d,%d,%d,%d\r\n",tmp_index_adc_converted_data,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);
-    //   HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-    // }
-    // HAL_ADC_Start(&hadc1);
+		HAL_UART_Transmit(&huart1,"app test v1\r\n",15,100);
   }
   /* USER CODE END 3 */
 }
