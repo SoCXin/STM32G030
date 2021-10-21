@@ -268,8 +268,10 @@ void TimeOutReset(uint8_t nsec)
 uint32_t chksum;
 #include <stdio.h>
 
-void Ymodem_Transmit(const uint32_t START_ADDR)
+void Ymodem_Transmit(uint8_t flag)
 {
+    uint32_t START_ADDR = USER_APP_ADDRESS;
+    if(flag==2) START_ADDR = USER_APP2_ADDRESS;
     switch(u8TranState)
     {
         case 0:
@@ -308,7 +310,6 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 u8TranState = 0; //超时继续发送“C”等待接收文件
             }
             break;
-
         case 2:
             if(u16Wait10ms)
             {
@@ -334,21 +335,27 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 }
             }
             break;
-
         case 3:
             if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
             {
                 chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
                 if(chksum == chksum)    //(chksum == u16FirmeareChksum)
                 {
-                    //如果和发送的校验和相等则重启完成升级
                     uint8_t buf[20] ;
                     sprintf((char *)buf, "\r\nChksum:%d,%d\r\n",chksum,u16FirmeareChksum);
                     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
                     txDownloadSuccess();
                     //u8TranState = 4; //程序下载完成
-                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 1234) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
-                    // delay_ms(500);
+                    if(flag==1)
+                    {
+                        if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,1234);
+
+                    }
+                    else if(flag==2)
+                    {
+                        if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+                        // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
+                    }
                     McuReset();
                 }
                 else
@@ -361,7 +368,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             {
                 static uint8_t buf[] = "Verify error!\r\n";
                 HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-                u8TranState = 4; //0 重新发起接收请求
+                u8TranState = 4;    //0 重新发起接收请求
             }
             break;
 

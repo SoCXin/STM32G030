@@ -160,18 +160,14 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uart_init();
 #ifdef APP
-	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP V1.0\r\n";
+	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP\r\n";
 	HAL_UART_Transmit(&huart1,buff,sizeof(buff)-1,100);
 #endif
 #ifdef BLT
-  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT V1.0\r\n";
+  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
 	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
   bootinit();
 #endif
-  // for (tmp_index = 0; tmp_index < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index++)
-  // {
-  //   aADCxConvertedData[tmp_index] = VAR_CONVERTED_DATA_INIT_VALUE;
-  // }
     // FlashTestWR();
   /* USER CODE END 2 */
 
@@ -187,17 +183,20 @@ int main(void)
 #ifdef BLT
     bootloop();
 #endif
-//    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
-//    {
-//      uint8_t temp_buf[] = "erase get.\r\n";
-//      HAL_UART_Transmit(&huart1,temp_buf,sizeof(temp_buf)-1,10);
-//    }
 #ifdef APP
     HAL_Delay(500);
-		HAL_UART_Transmit(&huart1,"app test\r\n",15,100);
+
+		#ifdef APP1
+		HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
+		HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
+		#endif
+		#ifdef APP2
+    HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
+		HAL_UART_Transmit(&huart1,"app2 test\r\n",15,100);
+		#endif
     if(roundcnt>20)
     {
-        HAL_UART_Transmit(&huart1,"app test end\r\n",15,100);
+        HAL_UART_Transmit(&huart1,"\r\ntest end\r\n",15,100);
         HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
         NVIC_SystemReset();
     }

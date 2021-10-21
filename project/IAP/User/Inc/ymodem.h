@@ -39,8 +39,8 @@ uint32_t GetFirmwareSize(uint8_t *rxbuf);
 uint32_t GetFirmwareChksum(uint8_t *rxbuf);
 uint32_t CalcRomChksum(uint32_t address, uint32_t length);
 
-void Ymodem_Transmit(const uint32_t START_ADDR);
-
+// void Ymodem_Transmit(const uint32_t START_ADDR);
+void Ymodem_Transmit(uint8_t flag);
 #ifdef __cplusplus
 }
 #endif
