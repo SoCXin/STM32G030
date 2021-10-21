@@ -193,10 +193,10 @@ int main(void)
 	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP V1.0\r\n";
 	HAL_UART_Transmit(&huart1,buff,sizeof(buff)-1,100);
 #endif
-//#ifdef BLT
+#ifdef BLT
 //	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
   ApplicationSelect();
-//#endif
+#endif
 	// uint8_t buff[] = "\r\nSTM32G030 APP V1.0\r\n";
 	// HAL_UART_Transmit(&huart1,buff,sizeof(buf)-1,100);
   // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)

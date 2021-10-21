@@ -130,7 +130,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-  HAL_SYSTICK_Callback();
+
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -140,39 +140,6 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32g0xx.s).                    */
 /******************************************************************************/
-
-/**
-  * @brief This function handles DMA1 channel 1 interrupt.
-  */
-void DMA1_Channel1_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 0 */
-
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
-  */
-void USART1_IRQHandler(void)
-{
-  /* USER CODE BEGIN USART1_IRQn 0 */
-	uint8_t tmp;
-	if(LL_USART_IsActiveFlag_RXNE(USART1)) //�?测是否接收中�?
-	{
-		LL_GPIO_ResetOutputPin(GPIOA,LL_GPIO_PIN_5);
-		tmp=LL_USART_ReceiveData8(USART1);   //读取出来接收到的数据
-		LL_USART_TransmitData8(USART1,tmp);  //把数据再从串口发送出�?
-	}
-  /* USER CODE END USART1_IRQn 0 */
-  /* USER CODE BEGIN USART1_IRQn 1 */
-
-  /* USER CODE END USART1_IRQn 1 */
-}
 
 /* USER CODE BEGIN 1 */
 

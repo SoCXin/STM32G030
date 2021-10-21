@@ -42,6 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 
+RTC_HandleTypeDef hrtc;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -59,16 +61,16 @@ uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 __IO uint16_t uwCRCValue = 0;
 __IO uint16_t testa = 0;
 #define BUFFER_SIZE    14
-static const uint8_t aDataBuffer[BUFFER_SIZE] =
-{
-  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7, 0x8, 0x9, 0xa, 0xb, 0xc,0xd, 0xe,
-};
+//static const uint8_t aDataBuffer[BUFFER_SIZE] =
+//{
+//  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7, 0x8, 0x9, 0xa, 0xb, 0xc,0xd, 0xe,
+//};
 
 __IO uint32_t tmp_index = 0;
 
 void HAL_SYSTICK_Callback(void)
 {
-  tmp_index++;
+    tmp_index++;
 }
 /* USER CODE END PFP */
 
@@ -81,9 +83,6 @@ uint8_t  u8TranState;
 uint16_t u16Wait10ms;
 uint16_t u16CntFlashPage;
 uint32_t chksum;
-#define FLASH_START_BASE    0x08000000
-#define USER_APP_ADDRESS    0x08004000
-#define APP_START_PAGE      ((USER_APP_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
 
 // void Ymodem_loop(void)
 // {
@@ -190,6 +189,28 @@ uint32_t chksum;
 //     }
 // }
 
+#define FLASH_START_BASE    0x08000000
+#define USER_APP_ADDRESS    0x08004000
+#define APP_START_PAGE      ((USER_APP_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
+
+typedef  void (*pFunction)(void);
+pFunction Jump_To_Application;
+uint32_t JumpAddress;
+
+void ApplicationSelect(void)
+{
+    // if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 1234)
+    {
+        if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        {
+            JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
+            Jump_To_Application = (pFunction) JumpAddress;
+            __set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
+            Jump_To_Application();
+        }
+    }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -205,13 +226,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
-
-  /* System interrupt init*/
-  /* SysTick_IRQn interrupt configuration */
-  NVIC_SetPriority(SysTick_IRQn, 3);
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -225,25 +240,28 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_RTC_Init();
-  MX_DMA_Init();
-  MX_USART1_UART_Init();
-  MX_CRC_Init();
+    MX_GPIO_Init();
+    MX_RTC_Init();
+    MX_DMA_Init();
+    MX_USART1_UART_Init();
+    MX_CRC_Init();
   /* USER CODE BEGIN 2 */
-	LL_USART_EnableIT_RXNE(USART1);
-	LL_USART_EnableIT_PE(USART1);
-  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) TEST\r\n";
-  for(uint8_t i=0;i<sizeof(buf)-1;i++)
-  {
-    LL_USART_TransmitData9(USART1, buf[i]);
-    while(!LL_USART_IsActiveFlag_TXE(USART1));
-  }
-  for(uint8_t i=0;i<BUFFER_SIZE;i++)
-  {
-    LL_CRC_FeedData8(CRC, aDataBuffer[i]);
-  }
-    testa = LL_CRC_ReadData16(CRC);
+		LL_USART_EnableIT_RXNE(USART1);
+		LL_USART_EnableIT_PE(USART1);
+    uint8_t buf[] = "\r\nSTM32G030 UART1(115200) TEST\r\n";
+    for(uint8_t i=0;i<sizeof(buf)-1;i++)
+    {
+        LL_USART_TransmitData9(USART1, buf[i]);
+        while(!LL_USART_IsActiveFlag_TXE(USART1));
+    }
+    HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+//   LL_RTC_BKP_SetRegister(BKP0R, LL_RTC_BKP_DR0, 0x1234);
+    ApplicationSelect();
+		for(uint8_t i=0;i<sizeof(buf)-1;i++)
+    {
+        LL_USART_TransmitData9(USART1, buf[i]);
+        while(!LL_USART_IsActiveFlag_TXE(USART1));
+    }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -255,6 +273,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
     LL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
     LL_mDelay(500);
+    // LL_CRC_ResetCRCCalculationUnit(CRC);
+    // for(uint8_t i=0;i<BUFFER_SIZE;i++)
+    // {
+    //   LL_CRC_FeedData8(CRC, aDataBuffer[i]);
+    // }
+    // testa = LL_CRC_ReadData16(CRC);
     memset((char *)buf,0,sizeof(buf));
     // uwCRCValue = HAL_CRC_Calculate(&hcrc, (uint32_t *)aDataBuffer, BUFFER_SIZE);
     sprintf((char *)buf, "CRC%d:%x,%x\r\n",tmp_index,testa,(uint16_t)((uwCRCValue>>8) | (uwCRCValue<<8)));
@@ -317,11 +341,14 @@ void SystemClock_Config(void)
 
   /* Set APB1 prescaler*/
   LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
-
-  LL_Init1msTick(64000000);
-
   /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
   LL_SetSystemCoreClock(64000000);
+
+   /* Update the time base */
+  if (HAL_InitTick (TICK_INT_PRIORITY) != HAL_OK)
+  {
+    Error_Handler();
+  }
   LL_RCC_EnableRTC();
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK1);
 }
@@ -367,19 +394,24 @@ static void MX_RTC_Init(void)
 
   /* USER CODE END RTC_Init 0 */
 
-  LL_RTC_InitTypeDef RTC_InitStruct = {0};
-
-  /* Peripheral clock enable */
-  LL_RCC_EnableRTC();
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_RTC);
-
   /* USER CODE BEGIN RTC_Init 1 */
 
   /* USER CODE END RTC_Init 1 */
-  RTC_InitStruct.HourFormat = LL_RTC_HOURFORMAT_24HOUR;
-  RTC_InitStruct.AsynchPrescaler = 127;
-  RTC_InitStruct.SynchPrescaler = 255;
-  LL_RTC_Init(RTC, &RTC_InitStruct);
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  hrtc.Init.OutPutPullUp = RTC_OUTPUT_PULLUP_NONE;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
