@@ -10,18 +10,6 @@ extern "C" {
 #include "stm32g0xx_hal.h"
 #include "stm32g0xx_ll_system.h"
 
-
-//typedef unsigned char  	u8;		// 无符号8位数
-//typedef signed   char  	s8;		// 有符号8位数
-//typedef unsigned short 	u16;	// 无符号16位数
-//typedef signed   short	s16;	// 有符号16位数
-//typedef signed  int   s32;
-//typedef unsigned int  u32;
-//typedef signed  long  s32;
-//typedef unsigned long u32;
-//typedef signed long long s64;
-//typedef unsigned long long u64;
-
 typedef uint8_t   u8;
 typedef int8_t    s8;
 typedef uint16_t u16;

@@ -1,7 +1,5 @@
 #ifndef YMODEM_H_
 #define YMODEM_H_
-
-
 #ifdef __cplusplus
 extern "C" {
 	#endif
@@ -33,7 +31,7 @@ void ms_count_down(void);
 uint16_t Y_Modem_CRC(uint8_t * buf, uint16_t len);
 void Send_CMD(uint8_t cmd);
 void Wait10msCountDwn(void);
-void Ymodem_Transmit(const uint32_t START_ADDR);
+
 uint8_t YmodemReceiveDate(const uint32_t START_ADDR);
 void UartRxUpdateCMD(uint32_t start_adress);
 
@@ -41,9 +39,11 @@ uint32_t GetFirmwareSize(uint8_t *rxbuf);
 uint32_t GetFirmwareChksum(uint8_t *rxbuf);
 uint32_t CalcRomChksum(uint32_t address, uint32_t length);
 
-	#ifdef __cplusplus
+void Ymodem_Transmit(const uint32_t START_ADDR);
+
+#ifdef __cplusplus
 }
 #endif
 
 
-#endif /* TIMER0_H_ */
+#endif

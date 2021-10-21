@@ -17,7 +17,8 @@ extern "C" {
 
 extern uint8_t  u8KeyInputSate;
 
-void ApplicationSelect(void);
+void bootinit(void);
+void bootloop(void);
 void PowerUpCounter(void);
 void PowUpKeyInputState(void);
 void Iap_Indicator(void);

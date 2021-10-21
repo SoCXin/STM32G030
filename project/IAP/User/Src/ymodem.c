@@ -267,6 +267,7 @@ void TimeOutReset(uint8_t nsec)
 //============================================================================
 uint32_t chksum;
 #include <stdio.h>
+
 void Ymodem_Transmit(const uint32_t START_ADDR)
 {
     switch(u8TranState)

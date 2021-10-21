@@ -193,11 +193,8 @@ int main(void)
 #ifdef BLT
   uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT V1.0\r\n";
 	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
-  ApplicationSelect();
+  bootinit();
 #endif
-	// uint8_t buff[] = "\r\nSTM32G030 APP V1.0\r\n";
-	// HAL_UART_Transmit(&huart1,buff,sizeof(buf)-1,100);
   // for (tmp_index_adc_converted_data = 0; tmp_index_adc_converted_data < ADC_CONVERTED_DATA_BUFFER_SIZE; tmp_index_adc_converted_data++)
   // {
   //   aADCxConvertedData[tmp_index_adc_converted_data] = VAR_CONVERTED_DATA_INIT_VALUE;
@@ -227,7 +224,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     HAL_IWDG_Refresh(&hiwdg);
 #ifdef BLT
-    Ymodem_Transmit(USER_APP_ADDRESS);
+    bootloop();
 #endif
 //    if(strcmp((char *)u8UartRxBuf, "erase") == 0)
 //    {
@@ -267,7 +264,7 @@ int main(void)
     // Tempruate=__HAL_ADC_CALC_TEMPERATURE(VrefData,aADCxConvertedData[2],ADC_RESOLUTION_12B);
 #ifdef APP
     HAL_Delay(500);
-		HAL_UART_Transmit(&huart1,"appv1\r\n",15,100);
+		HAL_UART_Transmit(&huart1,"app test\r\n",15,100);
 #endif
 //    memset((char *)buf,0,sizeof(buf));
 //    sprintf((char *)buf, "ADC[%d,%d,%d]:%d,%d,%d,%d\r\n",ubDmaTransferStatus,VrefData,Tempruate,aADCxConvertedData[0],aADCxConvertedData[1],aADCxConvertedData[2],aADCxConvertedData[3]);

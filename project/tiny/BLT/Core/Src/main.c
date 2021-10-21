@@ -197,7 +197,7 @@ typedef  void (*pFunction)(void);
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
 
-void ApplicationSelect(void)
+void bootloader(void)
 {
     // if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 1234)
     {
@@ -256,7 +256,7 @@ int main(void)
     }
     HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
 //   LL_RTC_BKP_SetRegister(BKP0R, LL_RTC_BKP_DR0, 0x1234);
-    ApplicationSelect();
+    bootloader();
 		for(uint8_t i=0;i<sizeof(buf)-1;i++)
     {
         LL_USART_TransmitData9(USART1, buf[i]);
