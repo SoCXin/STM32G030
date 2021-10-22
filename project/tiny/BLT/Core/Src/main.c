@@ -86,7 +86,7 @@ uint32_t chksum;
 
 // void Ymodem_loop(void)
 // {
-//     uint32_t START_ADDR= USER_APP_ADDRESS;
+//     uint32_t START_ADDR= USER_APP1_ADDRESS;
 //     switch(u8TranState)
 //     {
 //         case 0:
@@ -152,9 +152,9 @@ uint32_t chksum;
 //             break;
 
 //         case 3:
-//             if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+//             if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
 //             {
-//                 chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
+//                 chksum = CalcRomChksum(USER_APP1_ADDRESS, u16FirmeareSize);
 //                 if(chksum == chksum)    //(chksum == u16FirmeareChksum)
 //                 {
 //                     //如果和发送的校验和相等则重启完成升级
@@ -165,7 +165,7 @@ uint32_t chksum;
 //                     //u8TranState = 4; //程序下载完成
 //                     if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 1234) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
 //                     // delay_ms(500);
-//                     McuReset();
+//                     sysReset();
 //                 }
 //                 else
 //                 {
@@ -190,8 +190,8 @@ uint32_t chksum;
 // }
 
 #define FLASH_START_BASE    0x08000000
-#define USER_APP_ADDRESS    0x08004000
-#define APP_START_PAGE      ((USER_APP_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
+#define USER_APP1_ADDRESS    0x08004000
+#define APP_START_PAGE      ((USER_APP1_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
 
 typedef  void (*pFunction)(void);
 pFunction Jump_To_Application;
@@ -201,11 +201,11 @@ void bootloader(void)
 {
     // if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 1234)
     {
-        if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
-            JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
+            JumpAddress = *(__IO uint32_t*) (USER_APP1_ADDRESS + 4);
             Jump_To_Application = (pFunction) JumpAddress;
-            __set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
+            __set_MSP(*(__IO uint32_t*) USER_APP1_ADDRESS);
             Jump_To_Application();
         }
     }

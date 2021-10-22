@@ -10,7 +10,7 @@ extern "C" {
 #include "data_type.h"
 
 
-#define FLASH_MARK_BASE  USER_APP_ADDRESS - 0x10
+#define FLASH_MARK_BASE  USER_APP1_ADDRESS - 0x10
 
 #define FLASH_WAITETIME  1000
 

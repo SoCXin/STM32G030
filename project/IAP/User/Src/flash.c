@@ -4,53 +4,41 @@
 #include "flash.h"
 #include "ymodem.h"
 
+
 /******************************************************************************
-**º¯ÊıĞÅÏ¢ £º
-**¹¦ÄÜÃèÊö £º
-**ÊäÈë²ÎÊı £ºÎŞ
-**Êä³ö²ÎÊı £ºÎŞ
-*******************************************************************************/
-u32 STMFLASH_ReadWord(u32 addr)
-{
-	return *(vu32*)addr;
-}
-/******************************************************************************
-**º¯ÊıĞÅÏ¢ £º
-**¹¦ÄÜÃèÊö £º
-**ÊäÈë²ÎÊı £ºÎŞ
-**Êä³ö²ÎÊı £ºÎŞ
+**å‡½æ•°ä¿¡æ¯ ï¼š
+**åŠŸèƒ½æè¿° ï¼š
+**è¾“å…¥å‚æ•° ï¼šæ— 
+**è¾“å‡ºå‚æ•° ï¼šæ— 
 *******************************************************************************/
 u8  FlashPageRead(u32 address, u8 *pbuf)
 {
-	u32 i;
-	u32 readbuf;
-
-	u8  state = 0;
-	if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
-	{
-		return state;	//·Ç·¨µØÖ·
-	}
-
-	i = 0;
-	while(i<FLASH_PAGE_SIZE)
-	{
-		readbuf = STMFLASH_ReadWord(address);	//¶ÁÈ¡4¸ö×Ö½Ú.
-		pbuf[i++] = readbuf;
-		pbuf[i++] = readbuf >> 8;
-		pbuf[i++] = readbuf >> 16;
-		pbuf[i++] = readbuf >> 24;
-		address += 4;									        //Æ«ÒÆ4¸ö×Ö½Ú.
-	}
-
-	state = 1;
-	return state;
+    u32 i;
+    u32 readbuf;
+    u8  state = 0;
+    if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
+    {
+        return state;	//éæ³•åœ°å€
+    }
+    i = 0;
+    while(i<FLASH_PAGE_SIZE)
+    {
+        readbuf = *(vu32*)(address);	//è¯»å–4ä¸ªå­—èŠ‚.
+        pbuf[i++] = readbuf;
+        pbuf[i++] = readbuf >> 8;
+        pbuf[i++] = readbuf >> 16;
+        pbuf[i++] = readbuf >> 24;
+        address += 4;									        //åç§»4ä¸ªå­—èŠ‚.
+    }
+    state = 1;
+    return state;
 }
 
 /******************************************************************************
-**º¯ÊıĞÅÏ¢ £º
-**¹¦ÄÜÃèÊö £º
-**ÊäÈë²ÎÊı £ºÎŞ
-**Êä³ö²ÎÊı £ºÎŞ
+**å‡½æ•°ä¿¡æ¯ ï¼š
+**åŠŸèƒ½æè¿° ï¼š
+**è¾“å…¥å‚æ•° ï¼šæ— 
+**è¾“å‡ºå‚æ•° ï¼šæ— 
 *******************************************************************************/
 #define DATA_64   ((uint64_t)0x1234567887654321)
 u16 u16FlashProgState;
@@ -63,26 +51,26 @@ u8 FlashPageWrite(u32 address, u8 *pbuf)
 
 	if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
 	{
-		return state;	//·Ç·¨µØÖ·
+		return state;	//éæ³•åœ°å€
 	}
 
-	HAL_FLASH_Unlock();       //½âËø
-	FlashEraseInit.TypeErase = FLASH_TYPEERASE_PAGES;    //²Á³ıÀàĞÍ£¬Ò³²Á³ı
-	FlashEraseInit.Page = (address - FLASH_START_BASE) / FLASH_PAGE_SIZE;   						   //´ÓÄÄÒ³¿ªÊ¼²Á³ı
-	FlashEraseInit.NbPages = 1;               //Ò»´ÎÖ»²Á³ıÒ»Ò³
+	HAL_FLASH_Unlock();       //è§£é”
+	FlashEraseInit.TypeErase = FLASH_TYPEERASE_PAGES;    //æ“¦é™¤ç±»å‹ï¼Œé¡µæ“¦é™¤
+	FlashEraseInit.Page = (address - FLASH_START_BASE) / FLASH_PAGE_SIZE;   						   //ä»å“ªé¡µå¼€å§‹æ“¦é™¤
+	FlashEraseInit.NbPages = 1;               //ä¸€æ¬¡åªæ“¦é™¤ä¸€é¡µ
 	if(HAL_FLASHEx_Erase(&FlashEraseInit,&PageError) != HAL_OK)
 	{
 		HAL_FLASH_Lock();
-		return state;//·¢Éú´íÎóÁË
+		return state;//å‘ç”Ÿé”™è¯¯äº†
 	}
 	else
 	{
-		if(FLASH_WaitForLastOperation(FLASH_WAITETIME) == HAL_OK) ////µÈ´ıÉÏ´Î²Ù×÷Íê³É
+		if(FLASH_WaitForLastOperation(FLASH_WAITETIME) == HAL_OK) ////ç­‰å¾…ä¸Šæ¬¡æ“ä½œå®Œæˆ
 		{
 			uint64_t u64buffer;
 			u32 addr_index = 0;
 			u16FlashProgState = 0;
-			while(addr_index < FLASH_PAGE_SIZE)									//Ğ´Êı¾İ
+			while(addr_index < FLASH_PAGE_SIZE)									//å†™æ•°æ®
 			{
 				//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_15);//Led1_pin//HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);test
 
@@ -103,7 +91,7 @@ u8 FlashPageWrite(u32 address, u8 *pbuf)
 					u64buffer <<= 8;
 					u64buffer += pbuf[addr_index + 0];
 
-				if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address + addr_index, u64buffer)== HAL_OK)//Ğ´ÈëÊı¾İ
+				if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address + addr_index, u64buffer)== HAL_OK)//å†™å…¥æ•°æ®
 				{
 					addr_index += 8;
 
@@ -111,7 +99,7 @@ u8 FlashPageWrite(u32 address, u8 *pbuf)
 				else
 				{
 					HAL_FLASH_Lock();
-					break;												//Ğ´ÈëÒì³£
+					break;												//å†™å…¥å¼‚å¸¸
 				}
 			}
 
@@ -129,10 +117,10 @@ u8 FlashPageWrite(u32 address, u8 *pbuf)
 }
 
 /******************************************************************************
-**º¯ÊıĞÅÏ¢ £º
-**¹¦ÄÜÃèÊö £º
-**ÊäÈë²ÎÊı £ºÎŞ
-**Êä³ö²ÎÊı £ºÎŞ
+**å‡½æ•°ä¿¡æ¯ ï¼š
+**åŠŸèƒ½æè¿° ï¼š
+**è¾“å…¥å‚æ•° ï¼šæ— 
+**è¾“å‡ºå‚æ•° ï¼šæ— 
 *******************************************************************************/
 void FlashTestWR(void)
 {
@@ -150,12 +138,12 @@ void FlashTestWR(void)
 			j = 255;
 		}
 	}
-	FlashPageWrite(USER_APP_ADDRESS, FlashWriteBuf);
+	FlashPageWrite(USER_APP1_ADDRESS, FlashWriteBuf);
 	for(i=0; i<FLASH_PAGE_SIZE; i++)
 	{
 		FlashWriteBuf[i] = 0;
 	}
-	FlashPageRead(USER_APP_ADDRESS, FlashWriteBuf);
+	FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
 }
 
 /*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/

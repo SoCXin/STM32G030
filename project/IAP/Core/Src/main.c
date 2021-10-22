@@ -58,10 +58,7 @@ RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-__IO  uint32_t aADCxData[4];
-__IO  uint16_t aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
-
-uint16_t roundcnt = 0;
+uint32_t roundcnt = 0;
 uint32_t Tempruate;
 uint16_t VrefData,VolDta;
 uint32_t tmp_index = 0;
@@ -89,7 +86,9 @@ void HAL_SYSTICK_Callback(void)
 	Uart1Receive_TimerOut();
 	Wait10msCountDwn();
 	ms_count_down();
-	Iap_Indicator();
+  #ifdef BLT
+	BLT_Indicator();
+  #endif
   tmp_index++;
 }
 
@@ -159,14 +158,25 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
+//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,0);
+//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,0);
+//  HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,USER_APP1_ADDRESS);
+  // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,USER_APP2_ADDRESS);
 #ifdef APP
-	uint8_t buff[] = "\r\nSTM32G030 UART1(115200) APP\r\n";
-	HAL_UART_Transmit(&huart1,buff,sizeof(buff)-1,100);
+  uint8_t buf[50];
+  sprintf((char *)buf, "APP:%x,%x,%x,%x,%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4));
+  HAL_UART_Transmit(&huart1,(char *)buf,strlen((char *)buf),100);
 #endif
 #ifdef BLT
-  uint8_t buf[] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
-  bootinit();
+	uint8_t buf[50];
+//  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
+//	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
+	bootinit();
+	memset((char *)buf,0,sizeof(buf));
+  uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
+  uint16_t *uuid = (uint16_t *) UID_BASE;
+  sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),fsize);
+	HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -179,28 +189,48 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     HAL_IWDG_Refresh(&hiwdg);
-    roundcnt ++;
 #ifdef BLT
     bootloop();
-#endif
-#ifdef APP
-    HAL_Delay(500);
-
-		#ifdef APP1
-		HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
-		HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
-		#endif
-		#ifdef APP2
-    HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
-		HAL_UART_Transmit(&huart1,"app2 test\r\n",15,100);
-		#endif
-    if(roundcnt>20)
+    if(tmp_index>3000)
     {
-        HAL_UART_Transmit(&huart1,"\r\ntest end\r\n",15,100);
-        HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
-        NVIC_SystemReset();
+      tmp_index=0;
+			memset((char *)buf,0,sizeof(buf));
+			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4));
+			HAL_UART_Transmit(&huart1,(char *)buf,strlen((char *)buf),100);
     }
 #endif
+		#ifdef APP1
+		// HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
+		if(tmp_index%1000==0) HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
+		else if(tmp_index>6000)
+    {
+				tmp_index=0;
+				sprintf((char *)buf, "APP1:%x,%x,%x,%x,%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4));
+				HAL_UART_Transmit(&huart1,(char *)buf,strlen((char *)buf),100);
+        HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,USER_APP2_ADDRESS);
+				HAL_Delay(500);
+        NVIC_SystemReset();
+    }
+		#endif
+		#ifdef APP2
+    // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
+		if(tmp_index%1000==0) HAL_UART_Transmit(&huart1,"app2 test\r\n",15,100);
+		if(tmp_index>5000)
+    {
+				tmp_index=0;
+				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4));
+				HAL_UART_Transmit(&huart1,(char *)buf,strlen((char *)buf),100);
+        HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,0);
+				HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,USER_APP1_ADDRESS);
+				HAL_Delay(500);
+        NVIC_SystemReset();
+    }
+		#endif
   }
   /* USER CODE END 3 */
 }

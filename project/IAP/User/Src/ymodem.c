@@ -9,8 +9,13 @@ uint8_t  u8TranState;
 uint16_t u16Wait10ms;
 uint16_t u16CntFlashPage;
 
-//============================================================================
-uint16_t Y_Modem_CRC(uint8_t * buf, uint16_t len)
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint16_t Ymodem_CRC(uint8_t * buf, uint16_t len)
 {
     uint16_t chsum;
     uint16_t stat;
@@ -23,10 +28,14 @@ uint16_t Y_Modem_CRC(uint8_t * buf, uint16_t len)
     for (stat = len ; stat > 0; stat--) //len是所要计算的长度
     {
         chsum = chsum^(uint16_t)(*in_ptr++) << 8;
-        for (i=8; i!=0; i--) {
-            if (chsum & 0x8000){
+        for (i=8; i!=0; i--)
+        {
+            if (chsum & 0x8000)
+            {
                 chsum = chsum << 1 ^ 0x1021;
-            } else {
+            }
+            else
+            {
                 chsum = chsum << 1;
             }
         }
@@ -57,9 +66,12 @@ void ms_count_down(void)
 		u16Count1ms--;
 	}
 }
-//============================================================================
-
-//============================================================================
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
 void Send_CMD(uint8_t cmd)
 {
 	uint8_t buf[2];
@@ -148,9 +160,9 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
             temp = u8UartRxBuf[len-2];
             temp <<= 8;
             temp += u8UartRxBuf[len-1];
-                    static uint16_t chk_crc;
-            chk_crc = Y_Modem_CRC(&u8UartRxBuf[3], len-5);
-            if(temp == chk_crc) //Y_Modem_CRC(&u8UartRxBuf[3], len-5))
+            static uint16_t chk_crc;
+            chk_crc = Ymodem_CRC(&u8UartRxBuf[3], len-5);
+            if(temp == chk_crc) //Ymodem_CRC(&u8UartRxBuf[3], len-5))
             {
             if(u8TranState == 2)
             {
@@ -207,17 +219,15 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
                     }
                 }
             }
-
             state = 1;
-          }
-          else
-          {
+            }
+            else
+            {
             Send_CMD(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
-          }
+            }
         }
-
         u16Wait10ms = 25;
-      }
+        }
     }
   }
   else if(u8UartRxBuf[0] == MODEM_EOT)
@@ -239,16 +249,9 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 
   return state;
 }
-//============================================================================
 
-//============================================================================
-void McuReset(void)
-{
-	// 关闭所有中断
-	__disable_irq();//__set_FAULTMASK(1);//__set_FAULTMASK(1); //执行NVIC_SystemReset()函数不允许被打断，所以关总中断
-	// 复位
-	NVIC_SystemReset();
-}
+
+
 //============================================================================
 
 uint8_t u8TimeOut250ms;
@@ -259,19 +262,24 @@ void TimeOutReset(uint8_t nsec)
 	if(++u8TimeOut250ms > nsec * 4)
 	{
 		u8TimeOut250ms = 0;
-		McuReset();
+		sysReset();
 	}
 }
-//============================================================================
 
-//============================================================================
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
 uint32_t chksum;
 #include <stdio.h>
 
-void Ymodem_Transmit(uint8_t flag)
+void Ymodem_Transmit(const uint32_t START_ADDR)
 {
-    uint32_t START_ADDR = USER_APP_ADDRESS;
-    if(flag==2) START_ADDR = USER_APP2_ADDRESS;
+    // uint32_t START_ADDR = USER_APP1_ADDRESS;
+    // if(flag==1) START_ADDR = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0);
+    // else if(flag==2) START_ADDR = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     switch(u8TranState)
     {
         case 0:
@@ -336,27 +344,28 @@ void Ymodem_Transmit(uint8_t flag)
             }
             break;
         case 3:
-            if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+            if (((*(__IO uint32_t*)START_ADDR) & 0x2FFE0000 ) == 0x20000000)
             {
-                chksum = CalcRomChksum(USER_APP_ADDRESS, u16FirmeareSize);
-                if(chksum == chksum)    //(chksum == u16FirmeareChksum)
+                chksum = CalcRomChksum(START_ADDR, u16FirmeareSize);
+                if(chksum == chksum)    //(chksum == u16FirmeareChksum) 1087080/1082335
                 {
-                    uint8_t buf[20] ;
-                    sprintf((char *)buf, "\r\nChksum:%d,%d\r\n",chksum,u16FirmeareChksum);
+                    uint8_t buf[30] ;
+                    sprintf((char *)buf, "\r\nChksum:%x,%x,%x,%x\r\n",chksum,HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4),START_ADDR);
                     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == START_ADDR) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,chksum);
+                    else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == START_ADDR) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,chksum);
                     txDownloadSuccess();
                     //u8TranState = 4; //程序下载完成
-                    if(flag==1)
-                    {
-                        if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,1234);
-
-                    }
-                    else if(flag==2)
-                    {
-                        if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
-                        // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
-                    }
-                    McuReset();
+                    // if(flag==1)
+                    // {
+                    //     if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,1234);
+                    // }
+                    // else if(flag==2)
+                    // {
+                    //     if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == 0) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,1234);
+                    //     // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
+                    // }
+                    sysReset();
                 }
                 else
                 {

@@ -10,9 +10,20 @@ uint32_t JumpAddress;
 uint16_t u16Timer1ms;
 uint16_t u16Timer1sec;
 uint8_t  u8KeyInputSate;
-static uint8_t  boot_disk;
+static uint32_t app_ptr;
 
-
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void sysReset(void)
+{
+	// __set_FAULTMASK(1);
+    __disable_irq();     //不允许被打断，关总中断
+    NVIC_SystemReset();
+}
 
 /******************************************************************************
 **函数信息 ：
@@ -36,58 +47,6 @@ void PowerUpCounter(void)
         u8AdcTrig1ms++;
     }
 }
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-u8 u8KeyInputChkOver;
-void PowUpKeyInputState(void)
-{
-	uint16_t u16AdValueKey;
-	uint16_t u16KeyPress = 0;
-	uint8_t u8KeyInputSateOld = 0;
-	u8KeyInputSate = 0;
-	u8KeyInputChkOver = 0;
-	READ_KEY_AD:
-	if(u8KeyInputSateOld != u8KeyInputSate)
-	{
-		u16KeyPress = 0;
-		u8KeyInputSateOld = u8KeyInputSate;
-	}
-	while(u8AdcTrig1ms < 10)
-	{
-		HAL_IWDG_Refresh(&hiwdg);
-	}
-	u8AdcTrig1ms = 0;
-	// HAL_ADC_Start_DMA(&hadc1, (u32*)&u32aResultDMA, AD_CH_NUM); //
-	// u16AdValueKey = (uint16_t)u32aResultDMA[0];
-
-	if(u16AdValueKey >= 800 && u16AdValueKey <= 950)
-	{
-		u8KeyInputSate = 1;
-		if(++u16KeyPress < 100)
-		{
-			HAL_IWDG_Refresh(&hiwdg);
-			goto READ_KEY_AD;
-		}
-	}
-	else
-	{
-		u8KeyInputSate = 0;
-		if(++u16KeyPress < 10)
-		{
-			HAL_IWDG_Refresh(&hiwdg);
-			goto READ_KEY_AD;
-		}
-	}
-
-	u16Timer1ms = 0;
-	u16Timer1sec = 0;
-	while(u16Timer1ms < 100);
-	u8KeyInputChkOver = 1;
-}
 
 /******************************************************************************
 **函数信息 ：
@@ -96,19 +55,15 @@ void PowUpKeyInputState(void)
 **输出参数 ：无
 *******************************************************************************/
 uint8_t u8Cnt5HzDelay;
-void Iap_Indicator(void)
+void BLT_Indicator(void)
 {
-	if(u8KeyInputChkOver == 0)
-	{
-		return;
-	}
 	if(u8TranState <= 1)
 	{
 		u8Cnt5HzDelay = 0;
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		if(u16Timer1sec >= 30)
 		{
-			McuReset();
+			sysReset();
 		}
 	}
 	else if(u8TranState < 4)
@@ -130,8 +85,8 @@ void Iap_Indicator(void)
 			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 			if(++u8Cnt5HzDelay >= 30)
 			{
-				// uint8_t buf[] = "\r\nSTM32G070CB UART2(115200) Bootloader V1.0.\r\n";
-				// HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+				uint8_t buf[] = "\r\nSTM32G030 Bootloader \r\n";
+				HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 				u8TranState = 0;
 			}
 		}
@@ -145,30 +100,46 @@ void Iap_Indicator(void)
 *******************************************************************************/
 void bootinit(void)
 {
+    uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
     if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0))
     {
-        if (((*(__IO uint32_t*)USER_APP_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        app_ptr=HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0);
+        if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
-            boot_disk=2;
-            JumpAddress = *(__IO uint32_t*) (USER_APP_ADDRESS + 4);
-            Jump_To_Application = (pFunction) JumpAddress;
-            __set_MSP(*(__IO uint32_t*) USER_APP_ADDRESS);
-            // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,4321);
-            // HAL_UART_Transmit(&huart1,"\r\nSelect\r\n",15,100);
-            Jump_To_Application();
+            app_ptr=USER_APP1_ADDRESS;  //默认地址
+        }
+        else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3))
+        {
+            if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
+            {
+                JumpAddress = *(__IO uint32_t*) (app_ptr + 4);
+                Jump_To_Application = (pFunction) JumpAddress;
+                __set_MSP(*(__IO uint32_t*) app_ptr);
+                Jump_To_Application();
+            }
         }
     }
-    else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1))
+    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1))
     {
-        if (((*(__IO uint32_t*)USER_APP2_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        app_ptr=HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+        if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
         {
-            boot_disk=1;
-            JumpAddress = *(__IO uint32_t*) (USER_APP2_ADDRESS + 4);
-            Jump_To_Application = (pFunction) JumpAddress;
-            __set_MSP(*(__IO uint32_t*) USER_APP2_ADDRESS);
-            Jump_To_Application();
+            app_ptr=USER_APP2_ADDRESS;
+        }
+        else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4))
+        {
+            if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
+            {
+                JumpAddress = *(__IO uint32_t*) (app_ptr + 4);
+                Jump_To_Application = (pFunction) JumpAddress;
+                __set_MSP(*(__IO uint32_t*) app_ptr);
+                Jump_To_Application();
+            }
         }
     }
+    uint8_t buf[50] ;
+    sprintf((char *)buf, "IAP:%x,%x,%x,%x-%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4),app_ptr);
+    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 
 /******************************************************************************
@@ -179,8 +150,7 @@ void bootinit(void)
 *******************************************************************************/
 void bootloop(void)
 {
-    if(boot_disk==1) Ymodem_Transmit(1);
-    else Ymodem_Transmit(2);
+    if(app_ptr) Ymodem_Transmit(app_ptr);
 }
 
 /*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/

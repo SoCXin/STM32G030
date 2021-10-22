@@ -1096,7 +1096,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1120,7 +1120,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G030xx,APP,APP1</Define>
+              <Define>USE_HAL_DRIVER,STM32G030xx, APP1 APP</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include;                                 ../Drivers/CMSIS/Include;                                 ..\User\Inc;                                 ..\User\Src</IncludePath>
             </VariousControls>
@@ -1808,7 +1808,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8008000</StartAddress>
+                <StartAddress>0x800a000</StartAddress>
                 <Size>0x10000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -1846,7 +1846,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1870,7 +1870,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G030xx,APP,APP2</Define>
+              <Define>USE_HAL_DRIVER,STM32G030xx , APP2 APP</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include;                                 ../Drivers/CMSIS/Include;                                 ..\User\Inc;                                 ..\User\Src</IncludePath>
             </VariousControls>
