@@ -29,6 +29,17 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
+#include "stm32g0xx_ll_rtc.h"
+#include "stm32g0xx_ll_bus.h"
+#include "stm32g0xx_ll_cortex.h"
+#include "stm32g0xx_ll_rcc.h"
+#include "stm32g0xx_ll_system.h"
+#include "stm32g0xx_ll_utils.h"
+#include "stm32g0xx_ll_pwr.h"
+#include "stm32g0xx_ll_gpio.h"
+#include "stm32g0xx_ll_dma.h"
+
+#include "stm32g0xx_ll_exti.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -71,7 +82,7 @@ void Error_Handler(void);
   #define VAR_CONVERTED_DATA_INIT_VALUE    (DIGITAL_SCALE_12BITS + 1)
   /* Definition of ADCx conversions data table size */
   #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  8)
-extern RTC_HandleTypeDef hrtc;
+//extern RTC_HandleTypeDef hrtc;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

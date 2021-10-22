@@ -1,5 +1,6 @@
 #include "main.h"
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 #include "bootloader.h"
 #include "ymodem.h"
 
@@ -23,6 +24,37 @@ void sysReset(void)
 	// __set_FAULTMASK(1);
     __disable_irq();     //不允许被打断，关总中断
     NVIC_SystemReset();
+}
+
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void Mark_Set(uint8_t flag,uint32_t val)
+{
+    if(flag == 0)
+    {
+        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0,val);
+    }
+    else if(flag == 1)
+    {
+        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR1,val);
+    }
+    else if(flag == 2)
+    {
+        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR2,val);
+    }
+    else if(flag == 3)
+    {
+        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR3,val);
+    }
+    else if(flag == 4)
+    {
+        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR4,val);
+    }
+
 }
 
 /******************************************************************************
@@ -92,6 +124,7 @@ void BLT_Indicator(void)
 		}
 	}
 }
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
@@ -101,14 +134,14 @@ void BLT_Indicator(void)
 void bootinit(void)
 {
     uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
-    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0))
+    if(BKP_APP1_ADDR)
     {
-        app_ptr=HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0);
+        app_ptr=BKP_APP1_ADDR;
         if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
             app_ptr=USER_APP1_ADDRESS;  //默认地址
         }
-        else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3))
+        else if(BKP_APP1_CHECK)
         {
             if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
             {
@@ -119,14 +152,14 @@ void bootinit(void)
             }
         }
     }
-    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1))
+    if(BKP_APP2_ADDR)
     {
-        app_ptr=HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+        app_ptr=BKP_APP2_ADDR;
         if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
         {
             app_ptr=USER_APP2_ADDRESS;
         }
-        else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4))
+        else if(BKP_APP2_CHECK)
         {
             if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
             {
@@ -138,7 +171,7 @@ void bootinit(void)
         }
     }
     uint8_t buf[50] ;
-    sprintf((char *)buf, "IAP:%x,%x,%x,%x-%x\r\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4),app_ptr);
+    sprintf((char *)buf, "IAP:%x,%x,%x,%x-%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,app_ptr);
     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 

@@ -350,10 +350,11 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 if(chksum == chksum)    //(chksum == u16FirmeareChksum) 1087080/1082335
                 {
                     uint8_t buf[30] ;
-                    sprintf((char *)buf, "\r\nChksum:%x,%x,%x,%x\r\n",chksum,HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3),HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4),START_ADDR);
+                    sprintf((char *)buf, "\r\nChksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,BKP_APP1_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_APP2_ADDR);
                     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-                    if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == START_ADDR) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,chksum);
-                    else if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) == START_ADDR) HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,chksum);
+
+                    if(BKP_APP1_ADDR == START_ADDR) Mark_Set(3,chksum);
+                    else if(BKP_APP2_ADDR == START_ADDR)  Mark_Set(4,chksum);
                     txDownloadSuccess();
                     //u8TranState = 4; //程序下载完成
                     // if(flag==1)
