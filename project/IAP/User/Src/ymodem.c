@@ -166,11 +166,11 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
             {
             if(u8TranState == 2)
             {
-                uint32_t u32ProgramSize;
-                u32ProgramSize = PragamerAddr - START_ADDR;
-                if(u16FirmeareSize > u32ProgramSize)
+                uint32_t uint32_tProgramSize;
+                uint32_tProgramSize = PragamerAddr - START_ADDR;
+                if(u16FirmeareSize > uint32_tProgramSize)
                 {
-                    if((u16FirmeareSize - u32ProgramSize) >= FLASH_PAGE_SIZE)
+                    if((u16FirmeareSize - uint32_tProgramSize) >= FLASH_PAGE_SIZE)
                     {//大于等于2K
                         for(i=0; i<(len - 5); i++)
                         {
@@ -189,7 +189,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
                     {//小于2K
                         if(u8Program1K == 0)
                         {
-                            if((u16FirmeareSize - u32ProgramSize) >= 1024)
+                            if((u16FirmeareSize - uint32_tProgramSize) >= 1024)
                             {//1K~2K
                                 for(i=0; i<1024; i++)
                                 {

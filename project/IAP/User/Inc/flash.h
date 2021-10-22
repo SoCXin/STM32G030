@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_system.h"
-#include "data_type.h"
+#include "main.h"
+// #include "stm32g0xx_ll_system.h"
+//#include "data_type.h"
 
 
 #define FLASH_MARK_BASE  USER_APP1_ADDRESS - 0x10
@@ -15,8 +15,8 @@ extern "C" {
 #define FLASH_WAITETIME  1000
 
 
-u8  FlashPageRead(u32 address, u8 *pbuf);
-u8  FlashPageWrite(u32 address, u8 *pbuf);
+uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf);
+uint8_t  FlashPageWrite(uint32_t address, uint8_t *pbuf);
 void FlashTestWR(void);
 
 #ifdef __cplusplus

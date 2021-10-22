@@ -24,7 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-#include "data_type.h"
+//#include "data_type.h"
 #include "uart.h"
 #include "bootloader.h"
 #include "flash.h"

@@ -11,11 +11,11 @@
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-u8  FlashPageRead(u32 address, u8 *pbuf)
+uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf)
 {
-    u32 i;
-    u32 readbuf;
-    u8  state = 0;
+    uint32_t i;
+    uint32_t readbuf;
+    uint8_t  state = 0;
     if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
     {
         return state;	//非法地址
@@ -23,7 +23,7 @@ u8  FlashPageRead(u32 address, u8 *pbuf)
     i = 0;
     while(i<FLASH_PAGE_SIZE)
     {
-        readbuf = *(vu32*)(address);	//读取4个字节.
+        readbuf = *(uint32_t*)(address);	//读取4个字节.
         pbuf[i++] = readbuf;
         pbuf[i++] = readbuf >> 8;
         pbuf[i++] = readbuf >> 16;
@@ -41,13 +41,13 @@ u8  FlashPageRead(u32 address, u8 *pbuf)
 **输出参数 ：无
 *******************************************************************************/
 #define DATA_64   ((uint64_t)0x1234567887654321)
-u16 u16FlashProgState;
-u8 FlashPageWrite(u32 address, u8 *pbuf)
+uint16_t u16FlashProgState;
+uint8_t FlashPageWrite(uint32_t address, uint8_t *pbuf)
 {
 	FLASH_EraseInitTypeDef FlashEraseInit;
 	//HAL_StatusTypeDef FlashStatus = HAL_OK;
-	u32 PageError = 0;
-	u8  state = 0;
+	uint32_t PageError = 0;
+	uint8_t  state = 0;
 
 	if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
 	{
@@ -68,7 +68,7 @@ u8 FlashPageWrite(u32 address, u8 *pbuf)
 		if(FLASH_WaitForLastOperation(FLASH_WAITETIME) == HAL_OK) ////等待上次操作完成
 		{
 			uint64_t u64buffer;
-			u32 addr_index = 0;
+			uint32_t addr_index = 0;
 			u16FlashProgState = 0;
 			while(addr_index < FLASH_PAGE_SIZE)									//写数据
 			{
