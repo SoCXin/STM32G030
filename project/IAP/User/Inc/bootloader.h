@@ -5,10 +5,6 @@
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_system.h"
-//#include "data_type.h"
 #include "main.h"
 
 #define FLASH_SIZE_ADDR     0x1FFFF7E0

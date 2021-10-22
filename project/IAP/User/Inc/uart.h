@@ -5,8 +5,7 @@
 extern "C" {
 #endif
 
-#include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_system.h"
+#include "main.h"
 
 #define UART1BUF_SIZE 1029
 
@@ -27,3 +26,4 @@ void uart_init(void);
 #endif
 
 #endif
+/*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/

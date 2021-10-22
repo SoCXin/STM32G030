@@ -2,11 +2,9 @@
 #define YMODEM_H_
 #ifdef __cplusplus
 extern "C" {
-	#endif
+#endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_system.h"
+#include "main.h"
 
 /* Private define ------------------------------------------------------------*/
 #define MODEM_SOH 0x01 //133字节数据包类型，接收正常回应0x06(含文件信息的第一个包接收正常需回应0x06、0x43)

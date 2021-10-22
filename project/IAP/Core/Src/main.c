@@ -172,7 +172,7 @@ int main(void)
 	bootinit();
 	memset((char *)buf,0,sizeof(buf));
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
-  uint16_t *uuid = (uint16_t *) UID_BASE;
+//  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,fsize);
 	HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
 #endif
@@ -194,7 +194,7 @@ int main(void)
       tmp_index=0;
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_BOOT_CHECK);
-			HAL_UART_Transmit(&huart1,(char *)buf,strlen((char *)buf),100);
+			HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
     }
 #endif
 		#ifdef APP1

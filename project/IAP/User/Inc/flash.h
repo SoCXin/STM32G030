@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include "main.h"
-// #include "stm32g0xx_ll_system.h"
-//#include "data_type.h"
 
 
 #define FLASH_MARK_BASE  USER_APP1_ADDRESS - 0x10
@@ -24,3 +22,4 @@ void FlashTestWR(void);
 #endif
 
 #endif
+/*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/
