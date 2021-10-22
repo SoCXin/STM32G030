@@ -59,7 +59,7 @@ UART_HandleTypeDef huart1;
 uint32_t roundcnt = 0;
 uint32_t Tempruate;
 uint16_t VrefData,VolDta;
-uint32_t tmp_index = 0;
+volatile uint32_t tmp_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,11 +80,12 @@ static void MX_NVIC_Init(void);
 /* USER CODE BEGIN 0 */
 void HAL_SYSTICK_Callback(void)
 {
-	PowerUpCounter();
+  PowerUpCounter();
 	Uart1Receive_TimerOut();
 	Wait10msCountDwn();
 	ms_count_down();
   #ifdef BLT
+
 	BLT_Indicator();
   #endif
   tmp_index++;
@@ -156,10 +157,6 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
-//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,0);
-//	HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,0);
-//  HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,USER_APP1_ADDRESS);
-  // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,USER_APP2_ADDRESS);
 #ifdef APP
   char buf[50];
   sprintf(buf, "APP:%x,%x,%x,%x,%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_BOOT_CHECK);
@@ -199,7 +196,11 @@ int main(void)
 #endif
 		#ifdef APP1
 		// HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,0);
-		if(tmp_index%1000==0) HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
+		if(tmp_index%1000==0)
+		{
+			HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
+			tmp_index++;
+		}
 		else if(tmp_index>9000)
     {
 				tmp_index=0;
@@ -209,10 +210,6 @@ int main(void)
         Mark_Set(3,0);
         Mark_Set(4,0);
         Mark_Set(1,USER_APP2_ADDRESS);
-        // HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0);
-				// HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR3,0);
-				// HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR4,0);
-				// HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR1,USER_APP2_ADDRESS);
 				HAL_Delay(500);
         NVIC_SystemReset();
     }
@@ -463,7 +460,7 @@ static void MX_RTC_Init(void)
 {
 
   /* USER CODE BEGIN RTC_Init 0 */
- 
+
   /* USER CODE END RTC_Init 0 */
 
   LL_RTC_InitTypeDef RTC_InitStruct = {0};

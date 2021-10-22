@@ -87,8 +87,10 @@ void PowerUpCounter(void)
 **输出参数 ：无
 *******************************************************************************/
 uint8_t u8Cnt5HzDelay;
+
 void BLT_Indicator(void)
 {
+
 	if(u8TranState <= 1)
 	{
 		u8Cnt5HzDelay = 0;

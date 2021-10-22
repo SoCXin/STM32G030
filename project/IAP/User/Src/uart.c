@@ -47,7 +47,6 @@ void Uart1Receive_TimerOut(void)
 		u8CntUart1Timer1ms = 0;
 		u16Uart1RxIndex = 0;
 		Uart1Rxing = 0;
-		// HAL_UART_Transmit(&huart1,u8UartRxBuf,sizeof(u8UartRxBuf)-1,1000);
 	}
 	else if(Uart1Rxing)
 	{
