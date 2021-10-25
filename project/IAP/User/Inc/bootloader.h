@@ -26,8 +26,7 @@ extern uint8_t  u8KeyInputSate;
 void sysReset(void);
 void bootinit(void);
 void bootloop(void);
-void PowerUpCounter(void);
-void BLT_Indicator(void);
+void BootTimerInterrupt(void);
 void Mark_Set(uint8_t flag,uint32_t val);
 #ifdef __cplusplus
 }

@@ -57,14 +57,17 @@ void Mark_Set(uint8_t flag,uint32_t val)
 
 }
 
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
+uint8_t u8Cnt5HzDelay;
 uint8_t  u8AdcTrig1ms;
-void PowerUpCounter(void)
+
+void BootTimerInterrupt(void)
 {
     if(++u16Timer1ms >= 1000)
     {
@@ -74,57 +77,42 @@ void PowerUpCounter(void)
             u16Timer1sec++;
         }
     }
-    if(u8AdcTrig1ms < 0xff)
+    if(u8AdcTrig1ms < 0xff) u8AdcTrig1ms++;
+    Wait10msCountDwn();
+    if(u8TranState <= 1)
     {
-        u8AdcTrig1ms++;
+        u8Cnt5HzDelay = 0;
+        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+        if(u16Timer1sec >= 30)
+        {
+            sysReset();
+        }
     }
-}
-
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-uint8_t u8Cnt5HzDelay;
-
-void BLT_Indicator(void)
-{
-
-	if(u8TranState <= 1)
-	{
-		u8Cnt5HzDelay = 0;
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-		if(u16Timer1sec >= 30)
-		{
-			sysReset();
-		}
-	}
-	else if(u8TranState < 4)
-	{
-		if(u16Timer1ms < 500)
-		{
-			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-		}
-		else
-		{
-			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-		}
-	}
-	else
-	{
-		if(u8AdcTrig1ms >= 100)
-		{
-			u8AdcTrig1ms = 0;
-			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-			if(++u8Cnt5HzDelay >= 30)
-			{
-				uint8_t buf[] = "\r\nSTM32G030 Bootloader \r\n";
-				HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-				u8TranState = 0;
-			}
-		}
-	}
+    else if(u8TranState < 4)
+    {
+        if(u16Timer1ms < 500)
+        {
+            HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+        }
+        else
+        {
+            HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+        }
+    }
+    else
+    {
+        if(u8AdcTrig1ms >= 100)
+        {
+            u8AdcTrig1ms = 0;
+            HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+            if(++u8Cnt5HzDelay >= 30)
+            {
+                uint8_t buf[] = "\r\nSTM32G030 Bootloader \r\n";
+                HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                u8TranState = 0;
+            }
+        }
+    }
 }
 
 /******************************************************************************
@@ -136,6 +124,14 @@ void BLT_Indicator(void)
 void bootinit(void)
 {
     uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
+    if(BKP_APP1_ADDR==0 && BKP_APP2_ADDR==0 && BKP_APP1_CHECK==0 && BKP_APP2_CHECK==0)
+    {
+        Mark_Set(0,USER_APP1_ADDRESS);
+        Mark_Set(1,0);
+        Mark_Set(3,0);
+        Mark_Set(4,0);
+        // app_ptr=USER_APP1_ADDRESS;
+    }
     if(BKP_APP1_ADDR)
     {
         app_ptr=BKP_APP1_ADDR;

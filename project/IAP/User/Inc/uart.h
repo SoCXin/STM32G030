@@ -17,7 +17,7 @@ extern uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 extern uint8_t  u8CntUart1Timer1ms;
 
 
-void Uart1Receive_TimerOut(void);
+void UartTimerInterrupt(void);
 void ClrUartRxBuf(void);
 void uart_init(void);
 
