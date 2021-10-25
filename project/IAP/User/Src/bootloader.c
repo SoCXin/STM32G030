@@ -114,6 +114,24 @@ void BootTimerInterrupt(void)
         }
     }
 }
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint8_t appjump(const uint32_t addr)
+{
+    if (((*(__IO uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
+    {
+        JumpAddress = *(__IO uint32_t*) (addr + 4);
+        Jump_To_Application = (pFunction) JumpAddress;
+        __set_MSP(*(__IO uint32_t*) addr);
+        Jump_To_Application();
+        return 0;
+    }
+    else return 1;
+}
 
 /******************************************************************************
 **函数信息 ：
@@ -126,28 +144,29 @@ void bootinit(void)
     uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
     if(BKP_APP1_ADDR==0 && BKP_APP2_ADDR==0 && BKP_APP1_CHECK==0 && BKP_APP2_CHECK==0)
     {
-        Mark_Set(0,USER_APP1_ADDRESS);
-        Mark_Set(1,0);
-        Mark_Set(3,0);
-        Mark_Set(4,0);
-        // app_ptr=USER_APP1_ADDRESS;
+        if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        {
+            Mark_Set(0,USER_APP1_ADDRESS);
+            Mark_Set(3,1);
+        }
+        else if (((*(__IO uint32_t*)USER_APP2_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+        {
+            Mark_Set(1,USER_APP2_ADDRESS);
+            Mark_Set(4,1);
+        }
     }
     if(BKP_APP1_ADDR)
     {
         app_ptr=BKP_APP1_ADDR;
         if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
+            Mark_Set(0,USER_APP1_ADDRESS);
+            // Mark_Set(3,0);
             app_ptr=USER_APP1_ADDRESS;  //默认地址
         }
         else if(BKP_APP1_CHECK)
         {
-            if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
-            {
-                JumpAddress = *(__IO uint32_t*) (app_ptr + 4);
-                Jump_To_Application = (pFunction) JumpAddress;
-                __set_MSP(*(__IO uint32_t*) app_ptr);
-                Jump_To_Application();
-            }
+            if (appjump(app_ptr))  Mark_Set(3,0);
         }
     }
     if(BKP_APP2_ADDR)
@@ -155,17 +174,13 @@ void bootinit(void)
         app_ptr=BKP_APP2_ADDR;
         if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
         {
+            Mark_Set(1,USER_APP2_ADDRESS);
+            // Mark_Set(4,0);
             app_ptr=USER_APP2_ADDRESS;
         }
         else if(BKP_APP2_CHECK)
         {
-            if (((*(__IO uint32_t*)app_ptr) & 0x2FFE0000 ) == 0x20000000)
-            {
-                JumpAddress = *(__IO uint32_t*) (app_ptr + 4);
-                Jump_To_Application = (pFunction) JumpAddress;
-                __set_MSP(*(__IO uint32_t*) app_ptr);
-                Jump_To_Application();
-            }
+            if (appjump(app_ptr)) Mark_Set(4,0);
         }
     }
     uint8_t buf[50] ;
