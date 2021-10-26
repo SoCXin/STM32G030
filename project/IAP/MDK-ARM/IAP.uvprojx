@@ -1232,7 +1232,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G030xx,USE_FULL_LL_DRIVER, APP1, APP</Define>
+              <Define>USE_HAL_DRIVER,STM32G030xx,USE_FULL_LL_DRIVER, APP1</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include;                                 ../Drivers/CMSIS/Include;                                 ..\User\Inc;                                 ..\User\Src</IncludePath>
             </VariousControls>
@@ -1968,7 +1968,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>3</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1992,7 +1992,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32G030xx , APP2  USE_FULL_LL_DRIVER</Define>
+              <Define>USE_HAL_DRIVER, STM32G030xx  USE_FULL_LL_DRIVER   APP2</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc;                                 ../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include;                                 ../Drivers/CMSIS/Include;                                 ..\User\Inc;                                 ..\User\Src</IncludePath>
             </VariousControls>

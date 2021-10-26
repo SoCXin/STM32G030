@@ -15,11 +15,28 @@ extern "C" {
 
 #define APP_START_PAGE      ((USER_APP1_ADDRESS - FLASH_START_BASE) / FLASH_PAGE_SIZE)
 
-#define BKP_APP1_ADDR           LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR0)
-#define BKP_APP2_ADDR           LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR1)
-#define BKP_APP1_CHECK          LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR3)
-#define BKP_APP2_CHECK          LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR4)
-#define BKP_BOOT_CHECK          LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR2)
+typedef enum
+{
+    bkp_app1_addr,
+    bkp_app2_addr,
+    bkp_app1_mark,
+    bkp_app2_mark,
+    bkp_boot_mark
+}bkp_type;
+
+#define _USE_BKP
+
+#ifdef _USE_BKP
+#define BKP_APP1_ADDR           IAP_Get(bkp_app1_addr)
+#define BKP_APP2_ADDR           IAP_Get(bkp_app2_addr)
+#define BKP_APP1_CHECK          IAP_Get(bkp_app1_mark)
+#define BKP_APP2_CHECK          IAP_Get(bkp_app2_mark)
+#define BKP_BOOT_CHECK          IAP_Get(bkp_boot_mark)
+#else
+#endif
+
+
+
 
 extern uint8_t  u8KeyInputSate;
 
@@ -27,7 +44,10 @@ void sysReset(void);
 void bootinit(void);
 void bootloop(void);
 void BootTimerInterrupt(void);
-void Mark_Set(uint8_t flag,uint32_t val);
+
+uint8_t IAP_Set(bkp_type flag, uint32_t val);
+uint32_t IAP_Get(bkp_type flag);
+
 #ifdef __cplusplus
 }
 #endif

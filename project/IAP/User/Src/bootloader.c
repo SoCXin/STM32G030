@@ -21,40 +21,62 @@ static uint32_t app_ptr;
 *******************************************************************************/
 void sysReset(void)
 {
-	// __set_FAULTMASK(1);
     __disable_irq();     //不允许被打断，关总中断
     NVIC_SystemReset();
 }
-
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-void Mark_Set(uint8_t flag,uint32_t val)
+uint32_t IAP_Get(bkp_type flag)
 {
-    if(flag == 0)
-    {
-        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0,val);
-    }
-    else if(flag == 1)
-    {
-        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR1,val);
-    }
-    else if(flag == 2)
-    {
-        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR2,val);
-    }
-    else if(flag == 3)
-    {
-        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR3,val);
-    }
-    else if(flag == 4)
-    {
-        LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR4,val);
-    }
-
+    return LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR0+flag);
+}
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint8_t IAP_Set(bkp_type flag, uint32_t val)
+{
+    LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+flag,val);
+    return 0;
+    // switch (flag)
+    // {
+    // case bkp_app1_addr:
+    //     #ifdef _USE_BKP
+    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app1_addr,val);
+    //     #else
+    //     #endif
+    //     break;
+    // case bkp_app1_mark:
+    //     #ifdef _USE_BKP
+    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app1_mark,val);
+    //     #else
+    //     #endif
+    //     break;
+    // case bkp_app2_addr:
+    //     #ifdef _USE_BKP
+    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app2_addr,val);
+    //     #else
+    //     #endif
+    //     break;
+    // case bkp_app2_mark:
+    //     #ifdef _USE_BKP
+    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app2_mark,val);
+    //     #else
+    //     #endif
+    //     break;
+    // default:
+    //     #ifdef _USE_BKP
+    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_boot_mark,val);
+    //     #else
+    //     #endif
+    //     break;
+    // }
 }
 
 
@@ -146,13 +168,13 @@ void bootinit(void)
     {
         if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
-            Mark_Set(0,USER_APP1_ADDRESS);
-            Mark_Set(3,1);
+            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+            IAP_Set(bkp_app1_mark,1);
         }
         else if (((*(__IO uint32_t*)USER_APP2_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
-            Mark_Set(1,USER_APP2_ADDRESS);
-            Mark_Set(4,1);
+            IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+            IAP_Set(bkp_app2_mark,1);
         }
     }
     if(BKP_APP1_ADDR)
@@ -160,13 +182,12 @@ void bootinit(void)
         app_ptr=BKP_APP1_ADDR;
         if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
-            Mark_Set(0,USER_APP1_ADDRESS);
-            // Mark_Set(3,0);
+            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
             app_ptr=USER_APP1_ADDRESS;  //默认地址
         }
         else if(BKP_APP1_CHECK)
         {
-            if (appjump(app_ptr))  Mark_Set(3,0);
+            if (appjump(app_ptr)) IAP_Set(bkp_app1_mark,0);
         }
     }
     if(BKP_APP2_ADDR)
@@ -174,18 +195,14 @@ void bootinit(void)
         app_ptr=BKP_APP2_ADDR;
         if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
         {
-            Mark_Set(1,USER_APP2_ADDRESS);
-            // Mark_Set(4,0);
+            IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
             app_ptr=USER_APP2_ADDRESS;
         }
         else if(BKP_APP2_CHECK)
         {
-            if (appjump(app_ptr)) Mark_Set(4,0);
+            if (appjump(app_ptr)) IAP_Set(bkp_app2_mark,0);
         }
     }
-    uint8_t buf[50] ;
-    sprintf((char *)buf, "IAP:%x,%x,%x,%x-%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,app_ptr);
-    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 
 /******************************************************************************

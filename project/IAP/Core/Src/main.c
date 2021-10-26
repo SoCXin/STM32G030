@@ -150,7 +150,7 @@ int main(void)
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,fsize);
-	HAL_UART_Transmit(&huart1,buf,strlen((char *)buf),100);
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -183,10 +183,10 @@ int main(void)
     {
 				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_BOOT_CHECK);
 				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
-        Mark_Set(0,0);
-        Mark_Set(3,0);
-        Mark_Set(4,0);
-        Mark_Set(1,USER_APP2_ADDRESS);
+        IAP_Set(bkp_app1_addr,0);
+        IAP_Set(bkp_app1_mark,0);
+        IAP_Set(bkp_app2_mark,0);
+        IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
 //				HAL_Delay(500);
         NVIC_SystemReset();
     }
@@ -194,17 +194,17 @@ int main(void)
 		#ifdef APP2
 		if(HAL_GetTick()%1000==0)
     {
-      HAL_UART_Transmit(&huart1,"app2 test\r\n",15,100);
+      HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       HAL_Delay(1);
     }
 		if(HAL_GetTick()>15000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",BKP_APP1_ADDR,BKP_APP2_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_BOOT_CHECK);
 				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
-        Mark_Set(1,0);
-        Mark_Set(3,0);
-        Mark_Set(4,0);
-        Mark_Set(0,USER_APP1_ADDRESS);
+        IAP_Set(bkp_app2_addr,0);
+        IAP_Set(bkp_app2_mark,0);
+        IAP_Set(bkp_app1_mark,0);
+        IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
 				HAL_Delay(500);
         NVIC_SystemReset();
     }
