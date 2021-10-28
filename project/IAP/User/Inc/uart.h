@@ -20,7 +20,9 @@ extern uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 
 void UartTimerInterrupt(void);
 void ClrUartRxBuf(void);
+
 void uart_init(void);
+void uart_send_char(uint8_t ch);
 
 #ifdef __cplusplus
 }

@@ -150,7 +150,7 @@ int main(void)
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),fsize);
-	HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+  printf(buf);
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -169,7 +169,7 @@ int main(void)
     {
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-			HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+			printf(buf);
       HAL_Delay(1);
     }
 #endif
@@ -182,7 +182,7 @@ int main(void)
 		else if(HAL_GetTick()>16000)
     {
 				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
+				printf(buf);
         IAP_Set(bkp_app1_addr,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
@@ -200,7 +200,7 @@ int main(void)
 		if(HAL_GetTick()>15000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+				printf(buf);
         IAP_Set(bkp_app2_addr,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);

@@ -25,7 +25,7 @@ extern uint8_t  FlashWriteBuf[FLASH_PAGE_SIZE];
 
 
 void delay_ms(uint16_t ms);
-void Send_CMD(uint8_t cmd);
+
 void Wait10msCountDwn(void);
 uint16_t Ymodem_CRC(uint8_t * buf, uint16_t len);
 uint8_t YmodemReceiveDate(const uint32_t START_ADDR);

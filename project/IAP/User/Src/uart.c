@@ -1,6 +1,6 @@
 #include "main.h"
 #include "uart.h"
-
+#include <stdio.h>
 
 
 uint16_t u16Uart1RxIndex;
@@ -8,6 +8,15 @@ uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 uint8_t  u8CntUart1Timer1ms;
 uint8_t Uart1Rxing;
 uint8_t test;
+
+int fputc(int ch, FILE *f)
+{
+//    HAL_UART_Transmit(&huart1,(uint8_t*)&ch,1,10);
+    while((USART1->ISR&0X40)==0);
+    USART1->TDR = (uint8_t) ch;
+    return ch;
+}
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
@@ -73,6 +82,23 @@ static uint8_t u8Uart1RxBuf;
 void uart_init(void)
 {
     HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+}
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void uart_send_char(uint8_t cmd)
+{
+    uint8_t buf[2];
+    buf[0] = cmd;
+    buf[1] = 0;
+    // while((USART1->ISR&0X40)==0);
+    // USART1->TDR = cmd;
+    // while((USART1->ISR&0X40)==0);
+    // USART1->TDR = 0;
+    HAL_UART_Transmit(&huart1,buf,1,10);
 }
 
 /*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/
