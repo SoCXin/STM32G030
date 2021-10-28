@@ -24,16 +24,14 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-//#include "data_type.h"
-#include "uart.h"
-#include "bootloader.h"
-#include "flash.h"
+
 #include "ymodem.h"
+#include "bootloader.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+ 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -146,11 +144,11 @@ int main(void)
 //  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
 //	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 	bootinit();
-	memset((char *)buf,0,sizeof(buf));
+//	memset((char *)buf,0,sizeof(buf));
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),fsize);
-  printf(buf);
+  uart_tx_str((uint8_t *)buf,sizeof(buf));
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -167,9 +165,9 @@ int main(void)
     bootloop();
     if(HAL_GetTick()%5000==0)
     {
-			memset((char *)buf,0,sizeof(buf));
+//			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-			printf(buf);
+			uart_tx_str((uint8_t *)buf,sizeof(buf));
       HAL_Delay(1);
     }
 #endif
@@ -182,7 +180,7 @@ int main(void)
 		else if(HAL_GetTick()>16000)
     {
 				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				printf(buf);
+				uart_tx_str(buf,sizeof(buf));
         IAP_Set(bkp_app1_addr,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
@@ -194,13 +192,13 @@ int main(void)
 		#ifdef APP2
 		if(HAL_GetTick()%1000==0)
     {
-      HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
+      uart_tx_str("test app2\r\n",15);
       HAL_Delay(1);
     }
-		if(HAL_GetTick()>15000)
+		if(HAL_GetTick()>10000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				printf(buf);
+				uart_tx_str((uint8_t *)buf,sizeof(buf));
         IAP_Set(bkp_app2_addr,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);

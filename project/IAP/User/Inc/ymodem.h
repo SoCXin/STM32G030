@@ -5,8 +5,9 @@ extern "C" {
 #endif
 
 #include "main.h"
+#include "uart.h"
+#include "flash.h"
 
-/* Private define ------------------------------------------------------------*/
 #define MODEM_SOH 0x01 //133字节数据包类型，接收正常回应0x06(含文件信息的第一个包接收正常需回应0x06、0x43)
 #define MODEM_STX 0x02 //1029字节数据包类型，接收正常回应0x06
 #define MODEM_EOT 0x04 //发送文件传输结束命令，接收正常回应0x06、0x43(启动空包发送)
@@ -25,7 +26,6 @@ extern uint8_t  FlashWriteBuf[FLASH_PAGE_SIZE];
 
 
 void delay_ms(uint16_t ms);
-
 void Wait10msCountDwn(void);
 uint16_t Ymodem_CRC(uint8_t * buf, uint16_t len);
 uint8_t YmodemReceiveDate(const uint32_t START_ADDR);

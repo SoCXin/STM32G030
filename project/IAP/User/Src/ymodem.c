@@ -88,8 +88,8 @@ void Wait10msCountDwn(void)
 void txDownloadSuccess()
 {
 	static uint8_t buf[] = "Firmware download success! Restarting......\r\n";
-	// printf(buf);
-    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+    uart_tx_str(buf,sizeof(buf));
+    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 
 //============================================================================
@@ -98,8 +98,8 @@ void txDownloadSuccess()
 void msg_updating()
 {
 	static uint8_t buf[] = "Updating......\r\n";
-    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-	// printf(buf);
+    uart_tx_str(buf,sizeof(buf));
+    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 
@@ -108,7 +108,8 @@ void msg_updating()
 void msg_SlaveUpdateFail()
 {
 	static uint8_t buf[] = "\r\nFirmware Update fail! Time out!\r\n";
-    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+    uart_tx_str(buf,sizeof(buf));
+    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 	// printf(buf);
 }
 //============================================================================
@@ -125,7 +126,8 @@ void msg_enter()
 void msg_verifChksumError()
 {
 	static uint8_t buf[] = "Verify checkSum error!\r\n";
-	printf(buf);
+    uart_tx_str(buf,sizeof(buf));
+	// printf(buf);
 }
 
 
@@ -155,7 +157,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
             if((u8EndState == 2) && (u8UartRxBuf[1] == 0))
             {
                 state = 1;
-                uart_send_char(MODEM_ACK);
+                uart_tx_char(MODEM_ACK);
             }
             else
             {
@@ -223,7 +225,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
                 }
                 else
                 {
-                uart_send_char(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
+                uart_tx_char(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
                 }
             }
             u16Wait10ms = 25;
@@ -234,15 +236,15 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
         {//接收到传输完成，发送NAK和ACK应答
         if(u8EndState == 0)
         {
-            uart_send_char(MODEM_NAK);
+            uart_tx_char(MODEM_NAK);
 
             u8EndState = 1;
         }
         else if(u8EndState == 1)
         {
-            uart_send_char(MODEM_ACK);
+            uart_tx_char(MODEM_ACK);
             delay_ms(2);
-            //uart_send_char(MODEM_C);
+            //uart_tx_char(MODEM_C);
             u8EndState = 2;
         }
     }
@@ -281,7 +283,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             u16CntFlashPage = 0;
             u8CntRxFlame = 0;
             ClrUartRxBuf();
-            uart_send_char(MODEM_C);
+            uart_tx_char(MODEM_C);
             u16Wait10ms = 25;
             u8TranState = 1;
             break;
@@ -293,9 +295,9 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                     if(u8UartRxBuf[1] == 0x00)
                     {
                         //首帧数据包含文件名及数据大小
-                        uart_send_char(MODEM_ACK);
+                        uart_tx_char(MODEM_ACK);
                         delay_ms(2);
-                        uart_send_char(MODEM_C);
+                        uart_tx_char(MODEM_C);
                         u16FirmeareSize = GetFirmwareSize(u8UartRxBuf);
                         u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);
                         PragamerAddr = START_ADDR;
@@ -315,7 +317,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             {
                 if(YmodemReceiveDate(START_ADDR))
                 {
-                    uart_send_char(MODEM_ACK);
+                    uart_tx_char(MODEM_ACK);
                     u8TimeOut250ms = 0;
                 }
             }
@@ -325,7 +327,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 {
                     u16Uart1RxIndex = 0; //接收超时，接收计数清0
                     u16Wait10ms = 25;
-                    uart_send_char(MODEM_NAK); //重传当前数据包请求
+                    uart_tx_char(MODEM_NAK); //重传当前数据包请求
                     TimeOutReset(10);
                 }
                 else
