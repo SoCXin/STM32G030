@@ -179,7 +179,7 @@ int main(void)
 			HAL_UART_Transmit(&huart1,"app1 test\r\n",15,100);
       HAL_Delay(1);
 		}
-		else if(HAL_GetTick()>16000)
+		else if(HAL_GetTick()>10000)
     {
 				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
@@ -187,7 +187,6 @@ int main(void)
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
-//				HAL_Delay(500);
         NVIC_SystemReset();
     }
 		#endif
