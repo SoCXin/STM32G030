@@ -80,7 +80,7 @@ static void MX_TIM17_Init(void);
 // 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
 // width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
 //uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
-//__IO uint16_t uwCRCValue = 0;
+uint32_t uwCRCValue = 0;
 
 //static const uint8_t aDataBuffer[BUFFER_SIZE] =
 //{
@@ -131,6 +131,7 @@ int main(void)
 //  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
 //	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 	bootinit();
+	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
@@ -151,6 +152,9 @@ int main(void)
     feed_dog();
 #ifdef BLT
     bootloop();
+		LL_mDelay(300);
+    uart_tx_int(uwCRCValue);
+
     if(SysTick->VAL%9000==0)
     {
 			memset((char *)buf,0,sizeof(buf));
