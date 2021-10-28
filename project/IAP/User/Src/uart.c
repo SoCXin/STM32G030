@@ -11,25 +11,45 @@ uint8_t Uart1Rxing;
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
+// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
+// {
+//     if(uartHandle == &huart1)
+//     {
+//         __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
+//         __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+//         __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+//         if(u16Uart1RxIndex >= UART1BUF_SIZE)
+//         {
+//             u16Uart1RxIndex = 0;
+//         }
+//         u8UartRxBuf[u16Uart1RxIndex] = huart1.Instance->RDR;//u8Uart1RxBuf;
+//         u16Uart1RxIndex++;
+//         Uart1Rxing = 1;
+//         u8CntUart1Timer1ms = 0;
+//         HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+//     }
+// }
+
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void BootPortInterrupt(void)
 {
-    if(uartHandle == &huart1)
-    {
-        __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
-        __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-        __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-        if(u16Uart1RxIndex >= UART1BUF_SIZE)
-        {
-            u16Uart1RxIndex = 0;
-        }
-        u8UartRxBuf[u16Uart1RxIndex] = huart1.Instance->RDR;//u8Uart1RxBuf;
-        u16Uart1RxIndex++;
+    if(LL_USART_IsActiveFlag_RXNE(USART1))
+	{
+        if(u16Uart1RxIndex >= UART1BUF_SIZE) u16Uart1RxIndex = 0;
+        u8UartRxBuf[u16Uart1RxIndex++] = USART1->RDR;
         Uart1Rxing = 1;
         u8CntUart1Timer1ms = 0;
-        HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+	}
+    if(LL_USART_IsActiveFlag_PE(USART1))
+	{
+        LL_USART_ClearFlag_PE(USART1);
     }
 }
-
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
@@ -53,10 +73,12 @@ void UartTimerInterrupt(void)
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-static uint8_t u8Uart1RxBuf;
+// static uint8_t u8Uart1RxBuf;
 void uart_init(void)
 {
-    HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+    // HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
+    LL_USART_EnableIT_RXNE(USART1);
+    LL_USART_EnableIT_PE(USART1);
 }
 /******************************************************************************
 **函数信息 ：

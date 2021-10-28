@@ -106,7 +106,8 @@ void Wait10msCountDwn(void)
 void msg_updating()
 {
 	static uint8_t buf[] = "Updating......\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+	// HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+    uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
 }
 //============================================================================
 
@@ -115,7 +116,8 @@ void msg_updating()
 void msg_SlaveUpdateFail()
 {
 	static uint8_t buf[] = "\r\nFirmware Update fail! Time out!\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+	// HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+    uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
 }
 //============================================================================
 
@@ -123,7 +125,8 @@ void msg_SlaveUpdateFail()
 void msg_enter()
 {
 	static uint8_t buf[] = "\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+    uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
+	// HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 }
 //============================================================================
 // Verify checkSum error!
@@ -131,7 +134,7 @@ void msg_enter()
 void msg_verifChksumError()
 {
 	static uint8_t buf[] = "Verify checkSum error!\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+	uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
 }
 
 
