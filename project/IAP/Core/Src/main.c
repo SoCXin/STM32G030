@@ -24,7 +24,6 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-//#include "data_type.h"
 #include "uart.h"
 #include "bootloader.h"
 #include "flash.h"
@@ -169,7 +168,8 @@ int main(void)
     {
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-			HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+			// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+      uart_tx_str((uint8_t *)buf,strlen((char *)buf));
       HAL_Delay(1);
     }
 #endif
@@ -182,7 +182,8 @@ int main(void)
 		else if(HAL_GetTick()>10000)
     {
 				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
+				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
         IAP_Set(bkp_app1_addr,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
@@ -199,7 +200,8 @@ int main(void)
 		if(HAL_GetTick()>15000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-				HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
         IAP_Set(bkp_app2_addr,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);
