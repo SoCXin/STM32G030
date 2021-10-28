@@ -21,8 +21,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
         __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
         __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
         __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-        // test= huart1.Instance->RDR;
-        // HAL_UART_Transmit(&huart1,&test,1,100);
         if(u16Uart1RxIndex >= UART1BUF_SIZE)
         {
             u16Uart1RxIndex = 0;
@@ -33,17 +31,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
         u8CntUart1Timer1ms = 0;
         HAL_UART_Receive_IT(&huart1, &u8Uart1RxBuf, 1);
     }
-}
-//============================================================================
-
-//============================================================================
-void ClrUartRxBuf(void)
-{
-	uint16_t i;
-	for(i=0; i<UART1BUF_SIZE; i++)
-	{
-		u8UartRxBuf[i] = 0;
-	}
 }
 
 /******************************************************************************
@@ -87,6 +74,19 @@ void uart_tx_str(uint8_t *str, uint16_t Len)
         while((USART1->ISR&0X40)==0);
         USART1->TDR = str[i] ;
     }
+}
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void uart_tx_char(uint8_t ch)
+{
+    while((USART1->ISR&0X40)==0);
+    USART1->TDR = ch;
+    // while((USART1->ISR&0X40)==0);
+    // USART1->TDR = 0;
 }
 
 /*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/

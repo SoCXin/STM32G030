@@ -44,39 +44,6 @@ uint8_t IAP_Set(bkp_type flag, uint32_t val)
 {
     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+flag,val);
     return 0;
-    // switch (flag)
-    // {
-    // case bkp_app1_addr:
-    //     #ifdef _USE_BKP
-    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app1_addr,val);
-    //     #else
-    //     #endif
-    //     break;
-    // case bkp_app1_mark:
-    //     #ifdef _USE_BKP
-    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app1_mark,val);
-    //     #else
-    //     #endif
-    //     break;
-    // case bkp_app2_addr:
-    //     #ifdef _USE_BKP
-    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app2_addr,val);
-    //     #else
-    //     #endif
-    //     break;
-    // case bkp_app2_mark:
-    //     #ifdef _USE_BKP
-    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_app2_mark,val);
-    //     #else
-    //     #endif
-    //     break;
-    // default:
-    //     #ifdef _USE_BKP
-    //     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+bkp_boot_mark,val);
-    //     #else
-    //     #endif
-    //     break;
-    // }
 }
 
 
@@ -129,8 +96,6 @@ void BootTimerInterrupt(void)
             HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
             if(++u8Cnt5HzDelay >= 30)
             {
-                uint8_t buf[] = "\r\nSTM32G030 Bootloader \r\n";
-                HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
                 u8TranState = 0;
             }
         }

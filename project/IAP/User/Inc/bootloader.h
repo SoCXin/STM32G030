@@ -6,6 +6,9 @@ extern "C" {
 #endif
 
 #include "main.h"
+#include "uart.h"
+#include "flash.h"
+#include "ymodem.h"
 
 #define FLASH_SIZE_ADDR     0x1FFFF7E0
 #define FLASH_START_BASE    0x08000000
@@ -29,8 +32,6 @@ typedef enum
 #ifdef _USE_BKP
 #else
 #endif
-
-
 
 
 extern uint8_t  u8KeyInputSate;

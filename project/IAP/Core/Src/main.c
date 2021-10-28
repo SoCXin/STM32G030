@@ -24,10 +24,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-#include "uart.h"
+
 #include "bootloader.h"
-#include "flash.h"
-#include "ymodem.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -149,7 +148,8 @@ int main(void)
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),fsize);
-	HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+  uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */

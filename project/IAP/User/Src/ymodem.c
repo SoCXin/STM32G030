@@ -3,6 +3,7 @@
 #include "ymodem.h"
 #include "uart.h"
 #include "flash.h"
+#include <stdio.h>
 
 uint8_t  u8YmodeType;   //SOH(128) or STX(1024)
 uint8_t  u8TranState;
@@ -10,6 +11,39 @@ uint16_t u16Wait10ms;
 uint16_t u16CntFlashPage;
 
 uint8_t  FlashWriteBuf[FLASH_PAGE_SIZE];
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint16_t u16Count1ms;
+
+void delay_ms(uint16_t ms)
+{
+    u16Count1ms = ms;
+    while(u16Count1ms)
+    {
+        HAL_IWDG_Refresh(&hiwdg);
+    }
+}
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint8_t u8TimeOut250ms;
+
+void TimeOutReset(uint8_t nsec)
+{
+	if(nsec > 63) nsec = 63;
+	if(++u8TimeOut250ms > nsec * 4)
+	{
+		u8TimeOut250ms = 0;
+		sysReset();
+	}
+}
 
 /******************************************************************************
 **函数信息 ：
@@ -49,20 +83,8 @@ uint16_t Ymodem_CRC(uint8_t * buf, uint16_t len)
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-uint16_t u16Count1ms;
 
-void delay_ms(uint16_t ms)
-{
-    u16Count1ms = ms;
-    while(u16Count1ms)
-    {
-        HAL_IWDG_Refresh(&hiwdg);
-    }
-}
 
-//============================================================================
-
-//============================================================================
 uint8_t u8Cnt1ms;
 void Wait10msCountDwn(void)
 {
@@ -77,27 +99,7 @@ void Wait10msCountDwn(void)
 	}
 }
 
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-void Send_CMD(uint8_t cmd)
-{
-	uint8_t buf[2];
-	buf[0] = cmd;
-	buf[1] = 0;
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-}
-//============================================================================
 
-//============================================================================
-void txDownloadSuccess()
-{
-	static uint8_t buf[] = "Firmware download success! Restarting......\r\n";
-	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-}
 //============================================================================
 
 //============================================================================
@@ -159,7 +161,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
             if((u8EndState == 2) && (u8UartRxBuf[1] == 0))
             {
                 state = 1;
-                Send_CMD(MODEM_ACK);
+                uart_tx_char(MODEM_ACK);
             }
             else
             {
@@ -227,48 +229,33 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
                 }
                 else
                 {
-                Send_CMD(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
+                uart_tx_char(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
                 }
             }
             u16Wait10ms = 25;
             }
         }
-        }
-        else if(u8UartRxBuf[0] == MODEM_EOT)
-        {//接收到传输完成，发送NAK和ACK应答
+    }
+    else if(u8UartRxBuf[0] == MODEM_EOT)
+    {//接收到传输完成，发送NAK和ACK应答
         if(u8EndState == 0)
         {
-            Send_CMD(MODEM_NAK);
+            uart_tx_char(MODEM_NAK);
 
             u8EndState = 1;
         }
         else if(u8EndState == 1)
         {
-            Send_CMD(MODEM_ACK);
+            uart_tx_char(MODEM_ACK);
             delay_ms(2);
-            //Send_CMD(MODEM_C);
+            //uart_tx_char(MODEM_C);
             u8EndState = 2;
         }
     }
-
     return state;
 }
 
 
-
-//============================================================================
-
-uint8_t u8TimeOut250ms;
-//============================================================================
-void TimeOutReset(uint8_t nsec)
-{
-	if(nsec > 63) nsec = 63;
-	if(++u8TimeOut250ms > nsec * 4)
-	{
-		u8TimeOut250ms = 0;
-		sysReset();
-	}
-}
 
 /******************************************************************************
 **函数信息 ：
@@ -276,11 +263,11 @@ void TimeOutReset(uint8_t nsec)
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-uint32_t chksum;
-#include <stdio.h>
+
 
 void Ymodem_Transmit(const uint32_t START_ADDR)
 {
+    uint32_t chksum;
     switch(u8TranState)
     {
         case 0:
@@ -289,8 +276,8 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             u8EndState = 0;
             u16CntFlashPage = 0;
             u8CntRxFlame = 0;
-            ClrUartRxBuf();
-            Send_CMD(MODEM_C);
+            for(uint16_t i=0; i<UART1BUF_SIZE; i++) u8UartRxBuf[i] = 0;
+            uart_tx_char(MODEM_C);
             u16Wait10ms = 25;
             u8TranState = 1;
             break;
@@ -302,9 +289,9 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                     if(u8UartRxBuf[1] == 0x00)
                     {
                         //首帧数据包含文件名及数据大小
-                        Send_CMD(MODEM_ACK);
+                        uart_tx_char(MODEM_ACK);
                         delay_ms(2);
-                        Send_CMD(MODEM_C);
+                        uart_tx_char(MODEM_C);
                         u16FirmeareSize = GetFirmwareSize(u8UartRxBuf);
                         u16FirmeareChksum = GetFirmwareChksum(u8UartRxBuf);
                         PragamerAddr = START_ADDR;
@@ -324,7 +311,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             {
                 if(YmodemReceiveDate(START_ADDR))
                 {
-                    Send_CMD(MODEM_ACK);
+                    uart_tx_char(MODEM_ACK);
                     u8TimeOut250ms = 0;
                 }
             }
@@ -334,7 +321,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 {
                     u16Uart1RxIndex = 0; //接收超时，接收计数清0
                     u16Wait10ms = 25;
-                    Send_CMD(MODEM_NAK); //重传当前数据包请求
+                    uart_tx_char(MODEM_NAK); //重传当前数据包请求
                     TimeOutReset(10);
                 }
                 else
@@ -351,12 +338,11 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 if(chksum == chksum)    //(chksum == u16FirmeareChksum) 1087080/1082335
                 {
                     uint8_t buf[30] ;
-                    sprintf((char *)buf, "\r\nChksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,IAP_Get(bkp_app1_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_app2_addr));
-                    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
-
+                    sprintf((char *)buf, "\r\nIAP success! Chksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,IAP_Get(bkp_app1_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_app2_addr));
+                    // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                    uart_tx_str((uint8_t *)buf,sizeof(buf));
                     if(IAP_Get(bkp_app1_addr) == START_ADDR) IAP_Set(bkp_app1_mark,chksum);
                     else if(IAP_Get(bkp_app2_addr) == START_ADDR)  IAP_Set(bkp_app2_mark,chksum);
-                    txDownloadSuccess();
                     sysReset();
                 }
                 else
@@ -368,7 +354,7 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
             else
             {
                 static uint8_t buf[] = "Verify error!\r\n";
-                HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                uart_tx_str(buf,sizeof(buf));
                 u8TranState = 4;    //0 重新发起接收请求
             }
             break;
