@@ -1,13 +1,10 @@
 #include "main.h"
 #include "uart.h"
 
-
-
 uint16_t u16Uart1RxIndex;
 uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 uint8_t  u8CntUart1Timer1ms;
 uint8_t Uart1Rxing;
-uint8_t test;
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
