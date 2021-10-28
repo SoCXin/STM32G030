@@ -44,9 +44,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-CRC_HandleTypeDef hcrc;
 
-IWDG_HandleTypeDef hiwdg;
+TIM_HandleTypeDef htim17;
 
 /* USER CODE BEGIN PV */
 uint32_t roundcnt = 0;
@@ -62,6 +61,7 @@ static void MX_IWDG_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_CRC_Init(void);
 static void MX_RTC_Init(void);
+static void MX_TIM17_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -123,6 +123,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_CRC_Init();
   MX_RTC_Init();
+  MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
 	char buf[50];
@@ -147,23 +148,23 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_IWDG_Refresh(&hiwdg);
+    feed_dog();
 #ifdef BLT
     bootloop();
-    if(SysTick->VAL%5000==0)
+    if(SysTick->VAL%9000==0)
     {
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 			// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-      HAL_Delay(1);
+      LL_mDelay(3);
     }
 #endif
 		#ifdef APP1
 		if(SysTick->VAL%3000==0)
 		{
       uart_tx_str("App1 Mark\r\n",15);
-      HAL_Delay(1);
+      LL_mDelay(2);
 		}
 		else if(SysTick->VAL>10000)
     {
@@ -182,7 +183,7 @@ int main(void)
     {
       // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       uart_tx_str("app2 test\r\n",15);
-      HAL_Delay(1);
+      LL_mDelay(2);
     }
 		if(HAL_GetTick()>15000)
     {
@@ -193,7 +194,7 @@ int main(void)
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-				HAL_Delay(500);
+				LL_mDelay(500);
         NVIC_SystemReset();
     }
 		#endif
@@ -274,19 +275,17 @@ static void MX_CRC_Init(void)
 
   /* USER CODE END CRC_Init 0 */
 
+  /* Peripheral clock enable */
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
+
   /* USER CODE BEGIN CRC_Init 1 */
 
   /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
-  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
-  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
-  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
-  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
-  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_WORDS;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
+  LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
+  LL_CRC_SetPolynomialCoef(CRC, LL_CRC_DEFAULT_CRC32_POLY);
+  LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_32B);
+  LL_CRC_SetInitialData(CRC, LL_CRC_DEFAULT_CRC_INITVALUE);
   /* USER CODE BEGIN CRC_Init 2 */
 
   /* USER CODE END CRC_Init 2 */
@@ -308,14 +307,15 @@ static void MX_IWDG_Init(void)
   /* USER CODE BEGIN IWDG_Init 1 */
 
   /* USER CODE END IWDG_Init 1 */
-  hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
-  hiwdg.Init.Window = 4095;
-  hiwdg.Init.Reload = 4095;
-  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  LL_IWDG_Enable(IWDG);
+  LL_IWDG_EnableWriteAccess(IWDG);
+  LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_4);
+  LL_IWDG_SetReloadCounter(IWDG, 4095);
+  while (LL_IWDG_IsReady(IWDG) != 1)
   {
-    Error_Handler();
   }
+
+  LL_IWDG_ReloadCounter(IWDG);
   /* USER CODE BEGIN IWDG_Init 2 */
 
   /* USER CODE END IWDG_Init 2 */
@@ -350,6 +350,38 @@ static void MX_RTC_Init(void)
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
+  * @brief TIM17 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM17_Init(void)
+{
+
+  /* USER CODE BEGIN TIM17_Init 0 */
+
+  /* USER CODE END TIM17_Init 0 */
+
+  /* USER CODE BEGIN TIM17_Init 1 */
+
+  /* USER CODE END TIM17_Init 1 */
+  htim17.Instance = TIM17;
+  htim17.Init.Prescaler = 0;
+  htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim17.Init.Period = 65535;
+  htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim17.Init.RepetitionCounter = 0;
+  htim17.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim17) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM17_Init 2 */
+
+  /* USER CODE END TIM17_Init 2 */
 
 }
 
@@ -437,32 +469,44 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  LL_EXTI_InitTypeDef EXTI_InitStruct = {0};
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOC);
+  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
+  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+  /**/
+  LL_GPIO_ResetOutputPin(LED1_GPIO_Port, LED1_Pin);
 
-  /*Configure GPIO pin : KEY1_Pin */
-  GPIO_InitStruct.Pin = KEY1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(KEY1_GPIO_Port, &GPIO_InitStruct);
+  /**/
+  LL_EXTI_SetEXTISource(LL_EXTI_CONFIG_PORTC, LL_EXTI_CONFIG_LINE13);
 
-  /*Configure GPIO pin : LED1_Pin */
+  /**/
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_13;
+  EXTI_InitStruct.LineCommand = ENABLE;
+  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
+  LL_EXTI_Init(&EXTI_InitStruct);
+
+  /**/
+  LL_GPIO_SetPinPull(KEY1_GPIO_Port, KEY1_Pin, LL_GPIO_PULL_NO);
+
+  /**/
+  LL_GPIO_SetPinMode(KEY1_GPIO_Port, KEY1_Pin, LL_GPIO_MODE_INPUT);
+
+  /**/
   GPIO_InitStruct.Pin = LED1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+  NVIC_SetPriority(EXTI4_15_IRQn, 0);
+  NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 }
 

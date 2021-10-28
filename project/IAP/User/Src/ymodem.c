@@ -24,7 +24,7 @@ void delay_ms(uint16_t ms)
     u16Count1ms = ms;
     while(u16Count1ms)
     {
-        HAL_IWDG_Refresh(&hiwdg);
+        feed_dog() ;
     }
 }
 /******************************************************************************

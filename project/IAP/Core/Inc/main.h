@@ -29,6 +29,8 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
+#include "stm32g0xx_ll_crc.h"
+#include "stm32g0xx_ll_iwdg.h"
 #include "stm32g0xx_ll_rcc.h"
 #include "stm32g0xx_ll_bus.h"
 #include "stm32g0xx_ll_system.h"
@@ -44,7 +46,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 //extern ADC_HandleTypeDef hadc1;
-extern IWDG_HandleTypeDef hiwdg;
+//extern IWDG_HandleTypeDef hiwdg;
 //extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
 
@@ -71,12 +73,13 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY1_Pin GPIO_PIN_13
+#define KEY1_Pin LL_GPIO_PIN_13
 #define KEY1_GPIO_Port GPIOC
 #define KEY1_EXTI_IRQn EXTI4_15_IRQn
-#define LED1_Pin GPIO_PIN_4
+#define LED1_Pin LL_GPIO_PIN_4
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define   feed_dog()        LL_IWDG_ReloadCounter(IWDG)
   #define DIGITAL_SCALE_12BITS             ((uint32_t) 0xFFF)
   /* Init variable out of ADC expected conversion data range */
   #define VAR_CONVERTED_DATA_INIT_VALUE    (DIGITAL_SCALE_12BITS + 1)
