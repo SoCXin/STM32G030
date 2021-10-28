@@ -351,11 +351,11 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 if(chksum == chksum)    //(chksum == u16FirmeareChksum) 1087080/1082335
                 {
                     uint8_t buf[30] ;
-                    sprintf((char *)buf, "\r\nChksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,BKP_APP1_ADDR,BKP_APP1_CHECK,BKP_APP2_CHECK,BKP_APP2_ADDR);
+                    sprintf((char *)buf, "\r\nChksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,IAP_Get(bkp_app1_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_app2_addr));
                     HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
 
-                    if(BKP_APP1_ADDR == START_ADDR) IAP_Set(bkp_app1_mark,chksum);
-                    else if(BKP_APP2_ADDR == START_ADDR)  IAP_Set(bkp_app2_mark,chksum);
+                    if(IAP_Get(bkp_app1_addr) == START_ADDR) IAP_Set(bkp_app1_mark,chksum);
+                    else if(IAP_Get(bkp_app2_addr) == START_ADDR)  IAP_Set(bkp_app2_mark,chksum);
                     txDownloadSuccess();
                     sysReset();
                 }

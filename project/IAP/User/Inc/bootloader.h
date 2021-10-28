@@ -27,11 +27,6 @@ typedef enum
 #define _USE_BKP
 
 #ifdef _USE_BKP
-#define BKP_APP1_ADDR           IAP_Get(bkp_app1_addr)
-#define BKP_APP2_ADDR           IAP_Get(bkp_app2_addr)
-#define BKP_APP1_CHECK          IAP_Get(bkp_app1_mark)
-#define BKP_APP2_CHECK          IAP_Get(bkp_app2_mark)
-#define BKP_BOOT_CHECK          IAP_Get(bkp_boot_mark)
 #else
 #endif
 

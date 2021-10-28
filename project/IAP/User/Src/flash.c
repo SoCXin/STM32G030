@@ -111,57 +111,18 @@ uint8_t FlashPageWrite(uint32_t address, uint8_t *pbuf)
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-void FlashReset(void)
+void FlashReset(uint8_t bank)
 {
-	uint16_t i,j;
-	j = 255;
-	for(i=0; i<FLASH_PAGE_SIZE; i++)
+	for(uint16_t i=0; i<FLASH_PAGE_SIZE; i++)
 	{
-		FlashWriteBuf[i] = j;
-		if(j)
-		{
-			j--;
-		}
-		else
-		{
-			j = 255;
-		}
+		FlashWriteBuf[i] = 0xff;
 	}
-	FlashPageWrite(USER_APP1_ADDRESS, FlashWriteBuf);
-	for(i=0; i<FLASH_PAGE_SIZE; i++)
-	{
-		FlashWriteBuf[i] = 0;
-	}
-	FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
-}
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-void FlashTestWR(void)
-{
-	uint16_t i,j;
-	j = 255;
-	for(i=0; i<FLASH_PAGE_SIZE; i++)
-	{
-		FlashWriteBuf[i] = j;
-		if(j)
-		{
-			j--;
-		}
-		else
-		{
-			j = 255;
-		}
-	}
-	FlashPageWrite(USER_APP1_ADDRESS, FlashWriteBuf);
-	for(i=0; i<FLASH_PAGE_SIZE; i++)
-	{
-		FlashWriteBuf[i] = 0;
-	}
-	FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
+	FlashPageWrite(bank * FLASH_PAGE_SIZE, FlashWriteBuf);
+	// for(i=0; i<FLASH_PAGE_SIZE; i++)
+	// {
+	// 	FlashWriteBuf[i] = 0;
+	// }
+	// FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
 }
 
 

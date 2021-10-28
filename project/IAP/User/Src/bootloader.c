@@ -164,7 +164,7 @@ uint8_t appjump(const uint32_t addr)
 void bootinit(void)
 {
     uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
-    if(BKP_APP1_ADDR==0 && BKP_APP2_ADDR==0 && BKP_APP1_CHECK==0 && BKP_APP2_CHECK==0)
+    if(IAP_Get(bkp_app1_addr)==0 && IAP_Get(bkp_app2_addr)==0 && IAP_Get(bkp_app1_mark)==0 && IAP_Get(bkp_app2_mark)==0)
     {
         if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
@@ -177,28 +177,28 @@ void bootinit(void)
             IAP_Set(bkp_app2_mark,1);
         }
     }
-    if(BKP_APP1_ADDR)
+    if(IAP_Get(bkp_app1_addr))
     {
-        app_ptr=BKP_APP1_ADDR;
+        app_ptr=IAP_Get(bkp_app1_addr);
         if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
             IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
             app_ptr=USER_APP1_ADDRESS;  //默认地址
         }
-        else if(BKP_APP1_CHECK)
+        else if(IAP_Get(bkp_app1_mark))
         {
             if (appjump(app_ptr)) IAP_Set(bkp_app1_mark,0);
         }
     }
-    if(BKP_APP2_ADDR)
+    if(IAP_Get(bkp_app2_addr))
     {
-        app_ptr=BKP_APP2_ADDR;
+        app_ptr=IAP_Get(bkp_app2_addr);
         if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
         {
             IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
             app_ptr=USER_APP2_ADDRESS;
         }
-        else if(BKP_APP2_CHECK)
+        else if(IAP_Get(bkp_app2_mark))
         {
             if (appjump(app_ptr)) IAP_Set(bkp_app2_mark,0);
         }

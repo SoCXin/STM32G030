@@ -12,9 +12,10 @@ extern "C" {
 
 extern uint8_t  u8Uart1RxBuf;
 extern uint16_t u16Uart1RxIndex;
+extern uint8_t  u8CntUart1Timer1ms;
 extern uint8_t  u8UartRxBuf[UART1BUF_SIZE];
 
-extern uint8_t  u8CntUart1Timer1ms;
+
 
 
 void UartTimerInterrupt(void);

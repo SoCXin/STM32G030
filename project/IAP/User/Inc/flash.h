@@ -9,13 +9,12 @@ extern "C" {
 
 
 #define FLASH_MARK_BASE  USER_APP1_ADDRESS - 0x10
-
-#define FLASH_WAITETIME  1000
+#define FLASH_WAITETIME  FLASH_TIMEOUT_VALUE
 
 
 uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf);
 uint8_t  FlashPageWrite(uint32_t address, uint8_t *pbuf);
-void FlashTestWR(void);
+void FlashReset(uint8_t bank);
 
 #ifdef __cplusplus
 }
