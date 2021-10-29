@@ -132,7 +132,6 @@ void SysTick_Handler(void)
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 	BootTimerInterrupt();
-  uwCRCValue++;
   /* USER CODE END SysTick_IRQn 1 */
 }
 

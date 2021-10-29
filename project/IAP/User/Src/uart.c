@@ -16,15 +16,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *uartHandle)
 {
     if(uartHandle == &huart1)
     {
-        __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
-        __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-        __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
-        if(u16Uart1RxIndex >= UART1BUF_SIZE)
-        {
-            u16Uart1RxIndex = 0;
-        }
-        u8UartRxBuf[u16Uart1RxIndex] = huart1.Instance->RDR;//u8UartRxChar;
-        u16Uart1RxIndex++;
+        // __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE | UART_FLAG_RXFNE);
+        // __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+        // __HAL_UART_GET_IT(&huart1, UART_IT_RXNE | UART_IT_RXFNE);
+        if(u16Uart1RxIndex >= UART1BUF_SIZE) u16Uart1RxIndex = 0;
+        u8UartRxBuf[u16Uart1RxIndex++] = huart1.Instance->RDR;//u8Uart1RxBuf;
         Uart1Rxing = 1;
         u8CntUart1Timer1ms = 0;
         // BootPortInterrupt();

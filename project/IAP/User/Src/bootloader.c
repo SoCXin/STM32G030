@@ -34,12 +34,7 @@ uint32_t IAP_Get(bkp_type flag)
 {
     return LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR0+flag);
 }
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
+
 uint8_t IAP_Set(bkp_type flag, uint32_t val)
 {
     LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+flag,val);
@@ -58,7 +53,7 @@ uint8_t  u8AdcTrig1ms;
 
 void BootTimerInterrupt(void)
 {
-    PortTimerInterrupt();
+    UartTimerInterrupt();
     if(++u16Timer1ms >= 1000)
     {
         u16Timer1ms = 0;
@@ -153,7 +148,7 @@ void bootinit(void)
         if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
         {
             IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-            app_ptr=USER_APP1_ADDRESS;  //默认地址
+            app_ptr=USER_APP1_ADDRESS;      //默认地址
         }
         else if(IAP_Get(bkp_app1_mark))
         {

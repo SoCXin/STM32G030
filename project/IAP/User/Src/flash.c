@@ -13,14 +13,13 @@
 *******************************************************************************/
 uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf)
 {
-    uint32_t i;
+    uint32_t i = 0;
     uint32_t readbuf;
     uint8_t  state = 0;
     if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
     {
         return state;	//非法地址
     }
-    i = 0;
     while(i<FLASH_PAGE_SIZE)
     {
         readbuf = *(uint32_t*)(address);	//读取4个字节.
@@ -41,7 +40,6 @@ uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf)
 **输出参数 ：无
 *******************************************************************************/
 uint16_t u16FlashProgState;
-
 uint8_t FlashPageWrite(uint32_t address, uint8_t *pbuf)
 {
     FLASH_EraseInitTypeDef FlashEraseInit;
