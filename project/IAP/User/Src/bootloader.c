@@ -53,7 +53,7 @@ uint8_t  u8AdcTrig1ms;
 
 void BootTimerInterrupt(void)
 {
-    UartTimerInterrupt();
+    PortTimerInterrupt();
     if(++u16Timer1ms >= 1000)
     {
         u16Timer1ms = 0;
