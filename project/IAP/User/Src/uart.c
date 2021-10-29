@@ -46,7 +46,7 @@ void BootPortInterrupt(void)
         // LL_USART_TransmitData8(USART1, u8UartRxBuf[u16Uart1RxIndex]);
         // u16Uart1RxIndex++;
         Uart1Rxing = 1;
-        u8CntUart1Timer1ms = 0;
+        // u8CntUart1Timer1ms = 0;
         // LL_USART_TransmitData8(USART1, u16Uart1RxIndex);
 	}
     // if(LL_USART_IsActiveFlag_PE(USART1))
@@ -94,10 +94,10 @@ void uart_tx_str(uint8_t *str, uint16_t Len)
 {
     for(uint16_t i=0;i<Len;i++)
     {
-        // while((USART1->ISR&0X40)==0);
-        // USART1->TDR = str[i] ;
-        LL_USART_TransmitData8(USART1, str[i]);
-        while(!LL_USART_IsActiveFlag_TC(USART1));
+        while((USART1->ISR&0X40)==0);
+        USART1->TDR = str[i] ;
+        // LL_USART_TransmitData8(USART1, str[i]);
+        // while(!LL_USART_IsActiveFlag_TC(USART1));
     }
 }
 /******************************************************************************
@@ -108,10 +108,10 @@ void uart_tx_str(uint8_t *str, uint16_t Len)
 *******************************************************************************/
 void uart_tx_char(uint8_t ch)
 {
-    LL_USART_TransmitData8(USART1, ch);
-    while(!LL_USART_IsActiveFlag_TC(USART1));
-    // while((USART1->ISR&0X40)==0);
-    // USART1->TDR = ch;
+    // LL_USART_TransmitData8(USART1, ch);
+    // while(!LL_USART_IsActiveFlag_TC(USART1));
+    while((USART1->ISR&0X40)==0);
+    USART1->TDR = ch;
     // while((USART1->ISR&0X40)==0);
     // USART1->TDR = 0;
 }
