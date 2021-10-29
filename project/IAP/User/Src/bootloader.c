@@ -11,7 +11,7 @@ pFunction Jump_To_Application;
 uint32_t JumpAddress;
 uint16_t u16Timer1ms;
 uint16_t u16Timer1sec;
-uint8_t  u8KeyInputSate;
+
 static uint32_t app_ptr;
 
 /******************************************************************************
@@ -97,48 +97,48 @@ uint8_t appjump(const uint32_t addr)
 void bootinit(void)
 {
     uart_init();
-    uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
-    if(IAP_Get(bkp_app1_addr)==0 && IAP_Get(bkp_app2_addr)==0 && IAP_Get(bkp_app1_mark)==0 && IAP_Get(bkp_app2_mark)==0)
+    flash_init();
+    if(Mark_Get(bkp_app1_addr)==0 && Mark_Get(bkp_app2_addr)==0 && Mark_Get(bkp_app1_mark)==0 && Mark_Get(bkp_app2_mark)==0)
     {
         if (((*(__IO uint32_t*)USER_APP1_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
-            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-            IAP_Set(bkp_app1_mark,1);
+            Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+            Mark_Set(bkp_app1_mark,1);
         }
         else if (((*(__IO uint32_t*)USER_APP2_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
         {
-            IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
-            IAP_Set(bkp_app2_mark,1);
+            Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+            Mark_Set(bkp_app2_mark,1);
         }
         else
         {
-            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+            Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
         }
     }
-    if(IAP_Get(bkp_app1_addr))
+    if(Mark_Get(bkp_app1_addr))
     {
-        app_ptr=IAP_Get(bkp_app1_addr);
-        if(app_ptr < FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400 ||  app_ptr%FLASH_PAGE_SIZE)
+        app_ptr=Mark_Get(bkp_app1_addr);
+        if(app_ptr < FLASH_ADDR_BASE+QITAS_APP_MAX || app_ptr > FLASH_ADDR_BASE + flash_size ||  app_ptr%FLASH_PAGE_SIZE)
         {
-            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+            Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
             app_ptr=USER_APP1_ADDRESS;      //默认地址
         }
-        else if(IAP_Get(bkp_app1_mark))
+        else if(Mark_Get(bkp_app1_mark))
         {
-            if (appjump(app_ptr)) IAP_Set(bkp_app1_mark,0);
+            if (appjump(app_ptr)) Mark_Set(bkp_app1_mark,0);
         }
     }
-    if(IAP_Get(bkp_app2_addr))
+    if(Mark_Get(bkp_app2_addr))
     {
-        app_ptr=IAP_Get(bkp_app2_addr);
-        if(app_ptr< FLASH_START_BASE+FLASH_BLT_SIZEMAX || app_ptr > FLASH_START_BASE + fsize*0x400  || app_ptr%FLASH_PAGE_SIZE)
+        app_ptr=Mark_Get(bkp_app2_addr);
+        if(app_ptr< FLASH_ADDR_BASE+QITAS_APP_MAX || app_ptr > FLASH_ADDR_BASE + flash_size  || app_ptr%FLASH_PAGE_SIZE)
         {
-            IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+            Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
             app_ptr=USER_APP2_ADDRESS;
         }
-        else if(IAP_Get(bkp_app2_mark))
+        else if(Mark_Get(bkp_app2_mark))
         {
-            if (appjump(app_ptr)) IAP_Set(bkp_app2_mark,0);
+            if (appjump(app_ptr)) Mark_Set(bkp_app2_mark,0);
         }
     }
 }

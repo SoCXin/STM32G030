@@ -8,6 +8,13 @@ extern "C" {
 #include "main.h"
 #include "port.h"
 
+#define USER_APP1_ADDRESS   0x08004000
+#define USER_APP2_ADDRESS   0x08008000
+
+
+#define _USE_BKP
+
+
 typedef enum
 {
     bkp_app1_addr,
@@ -17,11 +24,11 @@ typedef enum
     bkp_boot_mark
 }bkp_type;
 
-#define USER_APP1_ADDRESS   0x08004000
-#define USER_APP2_ADDRESS   0x08008000
 
-uint8_t IAP_Set(bkp_type flag, uint32_t val);
-uint32_t IAP_Get(bkp_type flag);
+
+void sysReset(void);
+uint8_t Mark_Set(bkp_type flag, uint32_t val);
+uint32_t Mark_Get(bkp_type flag);
 
 
 #ifdef __cplusplus

@@ -62,17 +62,7 @@ static void MX_IWDG_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//#define BUFFER_SIZE    14
-// 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
-// width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
-//uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 uint32_t rcnt = 0;
-//static const uint8_t aDataBuffer[BUFFER_SIZE] =
-//{
-//  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7,
-//  0x8, 0x9, 0xa, 0xb, 0xc,0xd, 0xe,
-//};
-
 
 /* USER CODE END 0 */
 
@@ -115,9 +105,8 @@ int main(void)
 	bootinit();
 	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
-  uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
-  sprintf((char *)buf, "BLT:%x-%x,%x-%x,%dk\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),fsize);
+  sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #endif
@@ -141,7 +130,7 @@ int main(void)
     {
       feed_dog();
 			memset((char *)buf,0,sizeof(buf));
-			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
+			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
     }
 #endif
@@ -153,13 +142,13 @@ int main(void)
 		}
 		else if(rcnt>10000)
     {
-				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
+				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-        IAP_Set(bkp_app1_addr,0);
-        IAP_Set(bkp_app1_mark,0);
-        IAP_Set(bkp_app2_mark,0);
-        IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+        Mark_Set(bkp_app1_addr,0);
+        Mark_Set(bkp_app1_mark,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
 				LL_mDelay(20);
         NVIC_SystemReset();
     }
@@ -173,13 +162,13 @@ int main(void)
     }
 		else if(rcnt>10000)
     {
-				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
+				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-				IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-        IAP_Set(bkp_app2_addr,0);
-        IAP_Set(bkp_app2_mark,0);
-        IAP_Set(bkp_app1_mark,0);
+				Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+        Mark_Set(bkp_app2_addr,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app1_mark,0);
 				LL_mDelay(50);
         NVIC_SystemReset();
     }

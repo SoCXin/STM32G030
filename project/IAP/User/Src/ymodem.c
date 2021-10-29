@@ -342,11 +342,11 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 if(chksum == chksum)    //(chksum == u16FirmeareChksum) 1087080/1082335
                 {
                     uint8_t buf[30] ;
-                    sprintf((char *)buf, "\r\nIAP success! Chksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,IAP_Get(bkp_app1_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_app2_addr));
+                    sprintf((char *)buf, "\r\nIAP success! Chksum %x:%x:%x,%x,%x,%x\r\n",chksum,START_ADDR,Mark_Get(bkp_app1_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_app2_addr));
                     // HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
                     uart_tx_str((uint8_t *)buf,sizeof(buf));
-                    if(IAP_Get(bkp_app1_addr) == START_ADDR) IAP_Set(bkp_app1_mark,chksum);
-                    else if(IAP_Get(bkp_app2_addr) == START_ADDR)  IAP_Set(bkp_app2_mark,chksum);
+                    if(Mark_Get(bkp_app1_addr) == START_ADDR) Mark_Set(bkp_app1_mark,chksum);
+                    else if(Mark_Get(bkp_app2_addr) == START_ADDR)  Mark_Set(bkp_app2_mark,chksum);
                     sysReset();
                 }
                 else

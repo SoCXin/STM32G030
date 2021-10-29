@@ -10,6 +10,35 @@
 #include "ymodem.h"
 #include "bootloader.h"
 
+uint32_t flash_size;
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint8_t FlashCheck(uint32_t addr)
+{
+    uint8_t  ret = 0;
+    if((addr < FLASH_ADDR_BASE) || (addr >= FLASH_ADDR_BASE+flash_size))
+    {
+        ret = 1;
+    }
+    return ret;
+}
+
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+void flash_init(void)
+{
+    flash_size = *(uint16_t *)(FLASHSIZE_BASE);
+    flash_size *= 0x400;
+}
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
@@ -21,7 +50,7 @@ uint8_t  FlashPageRead(uint32_t address, uint8_t *pbuf)
     uint32_t i = 0;
     uint32_t readbuf;
     uint8_t  state = 0;
-    if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
+    if((address < FLASH_MARK_BASE) || ((address - FLASH_ADDR_BASE) % FLASH_PAGE_SIZE))
     {
         return state;	//非法地址
     }
@@ -50,13 +79,13 @@ uint8_t FlashPageWrite(uint32_t address, uint8_t *pbuf)
     FLASH_EraseInitTypeDef FlashEraseInit;
     uint32_t PageError = 0;
     uint8_t  state = 0;
-    if((address < FLASH_MARK_BASE) || ((address - FLASH_START_BASE) % FLASH_PAGE_SIZE))
+    if((address < FLASH_MARK_BASE) || ((address - FLASH_ADDR_BASE) % FLASH_PAGE_SIZE))
     {
         return state;	//非法地址
     }
     HAL_FLASH_Unlock();       //解锁
     FlashEraseInit.TypeErase = FLASH_TYPEERASE_PAGES;    //擦除类型，页擦除
-    FlashEraseInit.Page = (address - FLASH_START_BASE) / FLASH_PAGE_SIZE;   						   //从哪页开始擦除
+    FlashEraseInit.Page = (address - FLASH_ADDR_BASE) / FLASH_PAGE_SIZE;   						   //从哪页开始擦除
     FlashEraseInit.NbPages = 1;               //一次只擦除一页
     if(HAL_FLASHEx_Erase(&FlashEraseInit,&PageError) != HAL_OK)
     {
