@@ -82,7 +82,7 @@ static void MX_RTC_Init(void);
 // width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
 //uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 uint32_t uwCRCValue = 0;
-
+uint32_t rcnt = 0;
 //static const uint8_t aDataBuffer[BUFFER_SIZE] =
 //{
 //  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7,
@@ -127,7 +127,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uart_init();
 	char buf[50];
-  uint32_t rcnt = 0;
+
 #ifdef BLT
 //  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
 //	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
@@ -152,22 +152,23 @@ int main(void)
     /* USER CODE BEGIN 3 */
     feed_dog();
     rcnt++;
+		LL_mDelay(0);
+//		HAL_Delay(2);
 #ifdef BLT
-    bootloop();
-		LL_mDelay(1);
+		bootloop();
     // uart_tx_int(uwCRCValue);
-    if(rcnt%900==0)
+    if(rcnt%1000==0)
     {
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+//      LL_mDelay(3);
     }
 #endif
 		#ifdef APP1
-		if(rcnt%100==0)
+		if(rcnt%1000==0)
 		{
       uart_tx_str("App1 Mark\r\n",15);
-      LL_mDelay(2);
 		}
 		else if(rcnt>10000)
     {
@@ -178,26 +179,26 @@ int main(void)
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+				LL_mDelay(20);
         NVIC_SystemReset();
     }
 		#endif
 		#ifdef APP2
-		if(rcnt%100==0)
+		if(rcnt%1000==0)
     {
       // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       uart_tx_str("app2 test\r\n",15);
-      LL_mDelay(2);
     }
-		if(rcnt>1500)
+		else if(rcnt>10000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+				IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
         IAP_Set(bkp_app2_addr,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);
-        IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-				LL_mDelay(200);
+				LL_mDelay(50);
         NVIC_SystemReset();
     }
 		#endif
