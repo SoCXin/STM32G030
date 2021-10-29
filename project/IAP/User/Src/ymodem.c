@@ -9,7 +9,6 @@ uint8_t  u8YmodeType;   //SOH(128) or STX(1024)
 uint8_t  u8TranState;
 uint16_t u16Wait10ms;
 uint16_t u16CntFlashPage;
-
 uint8_t  FlashWriteBuf[FLASH_PAGE_SIZE];
 /******************************************************************************
 **函数信息 ：
@@ -21,11 +20,8 @@ uint16_t u16Count1ms;
 
 void delay_ms(uint16_t ms)
 {
-    u16Count1ms = ms;
-    while(u16Count1ms)
-    {
-        feed_dog() ;
-    }
+    LL_mDelay(ms);//
+    feed_dog();
 }
 /******************************************************************************
 **函数信息 ：
@@ -266,11 +262,9 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
 **输入参数 ：无
 **输出参数 ：无
 *******************************************************************************/
-
-
+uint32_t chksum;
 void Ymodem_Transmit(const uint32_t START_ADDR)
 {
-    uint32_t chksum;
     switch(u8TranState)
     {
         case 0:
@@ -350,7 +344,10 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 }
                 else
                 {
-                    msg_verifChksumError();
+                    static uint8_t buf[] = "Verify checkSum error!\r\n";
+										uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
+                    //HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+                    // msg_verifChksumError();
                     u8TranState = 4;        //0 重新发起接收请求
                 }
             }

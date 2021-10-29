@@ -116,11 +116,6 @@ void FlashReset(uint8_t bank)
         FlashWriteBuf[i] = 0xff;
     }
     FlashPageWrite(bank * FLASH_PAGE_SIZE, FlashWriteBuf);
-    // for(i=0; i<FLASH_PAGE_SIZE; i++)
-    // {
-    // 	FlashWriteBuf[i] = 0;
-    // }
-    // FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
 }
 
 

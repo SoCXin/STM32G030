@@ -29,7 +29,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_crc.h"
 #include "stm32g0xx_ll_iwdg.h"
 #include "stm32g0xx_ll_rcc.h"
 #include "stm32g0xx_ll_bus.h"
@@ -40,11 +39,11 @@ extern "C" {
 #include "stm32g0xx_ll_pwr.h"
 #include "stm32g0xx_ll_dma.h"
 #include "stm32g0xx_ll_rtc.h"
+#include "stm32g0xx_ll_usart.h"
 #include "stm32g0xx_ll_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//extern ADC_HandleTypeDef hadc1;
 //extern IWDG_HandleTypeDef hiwdg;
 //extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
@@ -78,9 +77,8 @@ void Error_Handler(void);
 #define LED1_Pin LL_GPIO_PIN_4
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-#define   feed_dog()        LL_IWDG_ReloadCounter(IWDG)
-extern uint32_t uwCRCValue;
-extern UART_HandleTypeDef huart1;
+// extern IWDG_HandleTypeDef hiwdg;
+#define   feed_dog()         LL_IWDG_ReloadCounter(IWDG) //LL_mDelay(0)  //HAL_IWDG_Refresh(&hiwdg) //
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

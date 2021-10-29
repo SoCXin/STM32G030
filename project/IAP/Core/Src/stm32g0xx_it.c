@@ -28,7 +28,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 #include "bootloader.h"
-#include "uart.h"
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -57,7 +56,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -143,16 +141,17 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles RCC global interrupt.
+  * @brief This function handles Flash global interrupt.
   */
-void RCC_IRQHandler(void)
+void FLASH_IRQHandler(void)
 {
-  /* USER CODE BEGIN RCC_IRQn 0 */
+  /* USER CODE BEGIN FLASH_IRQn 0 */
 
-  /* USER CODE END RCC_IRQn 0 */
-  /* USER CODE BEGIN RCC_IRQn 1 */
+  /* USER CODE END FLASH_IRQn 0 */
+  HAL_FLASH_IRQHandler();
+  /* USER CODE BEGIN FLASH_IRQn 1 */
 
-  /* USER CODE END RCC_IRQn 1 */
+  /* USER CODE END FLASH_IRQn 1 */
 }
 
 /**
@@ -190,10 +189,8 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 0 */
 
   /* USER CODE END USART1_IRQn 0 */
-  HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-  // BootPortInterrupt();
-
+  BootPortInterrupt();
   /* USER CODE END USART1_IRQn 1 */
 }
 

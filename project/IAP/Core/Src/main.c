@@ -45,45 +45,28 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-TIM_HandleTypeDef htim17;
-
-UART_HandleTypeDef huart1;
-
 /* USER CODE BEGIN PV */
-uint32_t roundcnt = 0;
-uint32_t Tempruate;
-uint16_t VrefData,VolDta;
-volatile uint32_t tmp_index = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_IWDG_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_CRC_Init(void);
 static void MX_RTC_Init(void);
-static void MX_TIM17_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// void HAL_SYSTICK_Callback(void)
-// {
-//   #ifdef BLT
-//   #endif
-//   tmp_index++;
-// }
-
 //#define BUFFER_SIZE    14
 // 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
 // width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
 //uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 uint32_t uwCRCValue = 0;
-
+uint32_t rcnt = 0;
 //static const uint8_t aDataBuffer[BUFFER_SIZE] =
 //{
 //  0x1, 0x2, 0x3, 0x4, 0x5, 0x6,0x7,
@@ -121,24 +104,20 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_IWDG_Init();
   MX_USART1_UART_Init();
-  MX_CRC_Init();
   MX_RTC_Init();
-  MX_TIM17_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-  uart_init();
+
 	char buf[50];
   uint32_t rcnt = 0;
 #ifdef BLT
-//  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
-//	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 	bootinit();
 	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
-  sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),fsize);
+  sprintf((char *)buf, "BLT:%x-%x,%x-%x,%dk\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),fsize);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #endif
@@ -152,56 +131,56 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    feed_dog();
     rcnt++;
+    LL_mDelay(0);
+    feed_dog();
+//		HAL_Delay(2);
 #ifdef BLT
-    bootloop();
-		LL_mDelay(1);
-    // uart_tx_int(uwCRCValue);
-    if(rcnt%9000==0)
+		bootloop();
+    if(rcnt%1000==0)
     {
+      feed_dog();
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-			// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-      LL_mDelay(3);
     }
 #endif
 		#ifdef APP1
-		if(rcnt%3000==0)
+		if(rcnt%1000==0)
 		{
+      feed_dog();
       uart_tx_str("App1 Mark\r\n",15);
-      LL_mDelay(2);
 		}
 		else if(rcnt>10000)
     {
-				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
+				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
         IAP_Set(bkp_app1_addr,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+				LL_mDelay(20);
         NVIC_SystemReset();
     }
 		#endif
 		#ifdef APP2
-		if(HAL_GetTick()%1000==0)
+		if(rcnt%1000==0)
     {
+      feed_dog();
       // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       uart_tx_str("app2 test\r\n",15);
-      LL_mDelay(2);
     }
-		if(HAL_GetTick()>15000)
+		else if(rcnt>10000)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+				IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
         IAP_Set(bkp_app2_addr,0);
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);
-        IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-				LL_mDelay(500);
+				LL_mDelay(50);
         NVIC_SystemReset();
     }
 		#endif
@@ -271,53 +250,7 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief CRC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CRC_Init(void)
-{
-
-  /* USER CODE BEGIN CRC_Init 0 */
-
-  /* USER CODE END CRC_Init 0 */
-
-  /* Peripheral clock enable */
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
-
-  /* USER CODE BEGIN CRC_Init 1 */
-
-  /* USER CODE END CRC_Init 1 */
-  LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
-  LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
-  LL_CRC_SetPolynomialCoef(CRC, LL_CRC_DEFAULT_CRC32_POLY);
-  LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_32B);
-  LL_CRC_SetInitialData(CRC, LL_CRC_DEFAULT_CRC_INITVALUE);
-  /* USER CODE BEGIN CRC_Init 2 */
-
-  /* USER CODE END CRC_Init 2 */
-
-}
-
-/**
   * @brief IWDG Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_IWDG_Init(void)
-{
-
-  /* USER CODE BEGIN IWDG_Init 0 */
-
-  /* USER CODE END IWDG_Init 0 */
-
-  /* USER CODE BEGIN IWDG_Init 1 */
-
-  /* USER CODE END IWDG_Init 1 */
-  LL_IWDG_Enable(IWDG);
-  LL_IWDG_EnableWriteAccess(IWDG);
-  LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_4);
-  LL_IWDG_SetReloadCounter(IWDG, 4095);
   while (LL_IWDG_IsReady(IWDG) != 1)
   {
   }
@@ -330,7 +263,6 @@ static void MX_IWDG_Init(void)
 }
 
 /**
-  * @brief RTC Initialization Function
   * @param None
   * @retval None
   */
@@ -404,35 +336,64 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 0 */
 
+  LL_USART_InitTypeDef USART_InitStruct = {0};
+
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* Peripheral clock enable */
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
+
+  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
+  /**USART1 GPIO Configuration
+  PA9   ------> USART1_TX
+  PA10   ------> USART1_RX
+  */
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_9;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_10;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Alternate = LL_GPIO_AF_1;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USART1 interrupt Init */
+  NVIC_SetPriority(USART1_IRQn, 0);
+  NVIC_EnableIRQ(USART1_IRQn);
+
   /* USER CODE BEGIN USART1_Init 1 */
 
   /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+  USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
+  USART_InitStruct.BaudRate = 115200;
+  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
+  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
+  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
+  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
+  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+  USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
+  LL_USART_Init(USART1, &USART_InitStruct);
+  LL_USART_SetTXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
+  LL_USART_SetRXFIFOThreshold(USART1, LL_USART_FIFOTHRESHOLD_1_8);
+  LL_USART_DisableFIFO(USART1);
+  LL_USART_ConfigAsyncMode(USART1);
+
+  /* USER CODE BEGIN WKUPType USART1 */
+
+  /* USER CODE END WKUPType USART1 */
+
+  LL_USART_Enable(USART1);
+
+  /* Polling USART1 initialisation */
+  while((!(LL_USART_IsActiveFlag_TEACK(USART1))) || (!(LL_USART_IsActiveFlag_REACK(USART1))))
   {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
-  {
-    Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
 
