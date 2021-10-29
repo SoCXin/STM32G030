@@ -44,7 +44,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-extern IWDG_HandleTypeDef hiwdg;
+//extern IWDG_HandleTypeDef hiwdg;
 //extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
 
@@ -77,7 +77,7 @@ void Error_Handler(void);
 #define LED1_Pin LL_GPIO_PIN_4
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-//extern RTC_HandleTypeDef hrtc;
+extern IWDG_HandleTypeDef hiwdg;
 #define   feed_dog()         HAL_IWDG_Refresh(&hiwdg) //LL_IWDG_ReloadCounter(IWDG) //LL_mDelay(0)  //
 /* USER CODE END Private defines */
 

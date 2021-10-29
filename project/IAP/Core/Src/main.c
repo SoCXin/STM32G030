@@ -47,32 +47,21 @@
 IWDG_HandleTypeDef hiwdg;
 
 /* USER CODE BEGIN PV */
-uint32_t roundcnt = 0;
-uint32_t Tempruate;
-uint16_t VrefData,VolDta;
-volatile uint32_t tmp_index = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_IWDG_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// void HAL_SYSTICK_Callback(void)
-// {
-//   #ifdef BLT
-//   #endif
-//   tmp_index++;
-// }
-
 //#define BUFFER_SIZE    14
 // 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 91 CB
 // width=16 poly=0x8005 init=0xffff refin=true refout=true xorout=0x0000 check=0x4b37 residue=0x0000 name="CRC-16/MODBUS"
@@ -116,9 +105,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_RTC_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
 	char buf[50];

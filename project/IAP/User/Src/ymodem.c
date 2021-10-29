@@ -9,7 +9,6 @@ uint8_t  u8YmodeType;   //SOH(128) or STX(1024)
 uint8_t  u8TranState;
 uint16_t u16Wait10ms;
 uint16_t u16CntFlashPage;
-
 uint8_t  FlashWriteBuf[FLASH_PAGE_SIZE];
 /******************************************************************************
 **函数信息 ：

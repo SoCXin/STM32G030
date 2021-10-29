@@ -67,7 +67,7 @@ void BootTimerInterrupt(void)
     if(u8TranState <= 1)
     {
         u8Cnt5HzDelay = 0;
-        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+        // HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
         if(u16Timer1sec >= 30)
         {
             sysReset();
@@ -77,11 +77,11 @@ void BootTimerInterrupt(void)
     {
         if(u16Timer1ms < 500)
         {
-            HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+            // HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
         }
         else
         {
-            HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+            // HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
         }
     }
     else
@@ -89,7 +89,7 @@ void BootTimerInterrupt(void)
         if(u8AdcTrig1ms >= 100)
         {
             u8AdcTrig1ms = 0;
-            HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+            // HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
             if(++u8Cnt5HzDelay >= 30)
             {
                 u8TranState = 0;

@@ -18,6 +18,9 @@ extern "C" {
 #define TIME_OVER_SETUP2  30000
 
 
+#ifndef FLASH_PAGE_SIZE
+#define FLASH_PAGE_SIZE     0x800
+#endif
 /* Extern variables ----------------------------------------------------------*/
 extern uint16_t u16Wait10ms;
 extern uint8_t  u8TranState;
