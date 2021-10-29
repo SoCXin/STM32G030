@@ -349,8 +349,8 @@ void Ymodem_Transmit(const uint32_t START_ADDR)
                 else
                 {
                     static uint8_t buf[] = "Verify checkSum error!\r\n";
-	                uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
-                    HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
+										uart_tx_str((uint8_t *)buf,sizeof((char *)buf));
+                    //HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,10);
                     // msg_verifChksumError();
                     u8TranState = 4;        //0 重新发起接收请求
                 }

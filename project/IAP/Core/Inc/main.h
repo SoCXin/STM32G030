@@ -29,23 +29,23 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
-#include "stm32g0xx_ll_rtc.h"
-#include "stm32g0xx_ll_bus.h"
-#include "stm32g0xx_ll_cortex.h"
 #include "stm32g0xx_ll_rcc.h"
+#include "stm32g0xx_ll_bus.h"
 #include "stm32g0xx_ll_system.h"
+#include "stm32g0xx_ll_exti.h"
+#include "stm32g0xx_ll_cortex.h"
 #include "stm32g0xx_ll_utils.h"
 #include "stm32g0xx_ll_pwr.h"
-#include "stm32g0xx_ll_gpio.h"
 #include "stm32g0xx_ll_dma.h"
-
-#include "stm32g0xx_ll_exti.h"
+#include "stm32g0xx_ll_rtc.h"
+#include "stm32g0xx_ll_usart.h"
+#include "stm32g0xx_ll_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 extern IWDG_HandleTypeDef hiwdg;
-extern UART_HandleTypeDef huart1;
+//extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -71,14 +71,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY1_Pin GPIO_PIN_13
+#define KEY1_Pin LL_GPIO_PIN_13
 #define KEY1_GPIO_Port GPIOC
 #define KEY1_EXTI_IRQn EXTI4_15_IRQn
-#define LED1_Pin GPIO_PIN_4
+#define LED1_Pin LL_GPIO_PIN_4
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 //extern RTC_HandleTypeDef hrtc;
-#define   feed_dog()         HAL_IWDG_Refresh(&hiwdg) //LL_IWDG_ReloadCounter(IWDG)
+#define   feed_dog()         HAL_IWDG_Refresh(&hiwdg) //LL_IWDG_ReloadCounter(IWDG) //LL_mDelay(0)  //
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
