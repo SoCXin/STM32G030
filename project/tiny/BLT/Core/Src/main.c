@@ -56,7 +56,7 @@ static void MX_DMA_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
-uint8_t u8Uart1RxBuf;
+uint8_t u8UartRxChar;
 uint16_t uwExpectedCRCValue = 0xCB92; //0xCB91;
 __IO uint16_t uwCRCValue = 0;
 __IO uint16_t testa = 0;

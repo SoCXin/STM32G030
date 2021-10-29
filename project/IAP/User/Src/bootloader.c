@@ -142,6 +142,10 @@ void bootinit(void)
             IAP_Set(bkp_app2_addr,USER_APP2_ADDRESS);
             IAP_Set(bkp_app2_mark,1);
         }
+        else
+        {
+            IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+        }
     }
     if(IAP_Get(bkp_app1_addr))
     {
@@ -179,7 +183,7 @@ void bootinit(void)
 *******************************************************************************/
 void bootloop(void)
 {
-    // if(app_ptr) Ymodem_Transmit(app_ptr);
+    if(app_ptr) Ymodem_Transmit(app_ptr);
     // uart_tx_char(u16Uart1RxIndex);
     // uart_tx_char(u8CntUart1Timer1ms);
 }

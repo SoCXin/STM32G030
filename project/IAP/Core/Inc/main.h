@@ -40,7 +40,6 @@ extern "C" {
 #include "stm32g0xx_ll_pwr.h"
 #include "stm32g0xx_ll_dma.h"
 #include "stm32g0xx_ll_rtc.h"
-#include "stm32g0xx_ll_usart.h"
 #include "stm32g0xx_ll_gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -81,7 +80,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 #define   feed_dog()        LL_IWDG_ReloadCounter(IWDG)
 extern uint32_t uwCRCValue;
-//extern RTC_HandleTypeDef hrtc;
+extern UART_HandleTypeDef huart1;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
