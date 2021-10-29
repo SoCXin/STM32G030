@@ -44,7 +44,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
 IWDG_HandleTypeDef hiwdg;
 
 UART_HandleTypeDef huart1;
@@ -258,7 +257,6 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
-
 
 /**
   * @brief IWDG Initialization Function
