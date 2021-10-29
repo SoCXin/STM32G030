@@ -1,9 +1,16 @@
-#include "main.h"
-#include "bootloader.h"
-#include "ymodem.h"
-#include "uart.h"
-#include "flash.h"
+/*******************************************************************************
+****版本：
+****平台：
+****日期：
+****作者：Qitas
+****版权：
+*******************************************************************************/
 #include <stdio.h>
+#include "ymodem.h"
+
+#include "flash.h"
+
+#include "bootloader.h"
 
 uint8_t  u8YmodeType;   //SOH(128) or STX(1024)
 uint8_t  u8TranState;
@@ -228,7 +235,7 @@ uint8_t YmodemReceiveDate(const uint32_t START_ADDR)
                 }
                 else
                 {
-                uart_tx_char(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
+									uart_tx_char(MODEM_NAK); //接收方crc校验出错,重传当前数据包请求
                 }
             }
             u16Wait10ms = 25;

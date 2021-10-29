@@ -1,8 +1,9 @@
 #include "main.h"
 #include <stdio.h>
 #include <string.h>
-#include "bootloader.h"
+#include "common.h"
 #include "ymodem.h"
+#include "bootloader.h"
 
 typedef  void (*pFunction)(void);
 
@@ -12,35 +13,6 @@ uint16_t u16Timer1ms;
 uint16_t u16Timer1sec;
 uint8_t  u8KeyInputSate;
 static uint32_t app_ptr;
-
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-void sysReset(void)
-{
-    __disable_irq();     //不允许被打断，关总中断
-    NVIC_SystemReset();
-}
-/******************************************************************************
-**函数信息 ：
-**功能描述 ：
-**输入参数 ：无
-**输出参数 ：无
-*******************************************************************************/
-uint32_t IAP_Get(bkp_type flag)
-{
-    return LL_RTC_BKP_GetRegister(TAMP,LL_RTC_BKP_DR0+flag);
-}
-
-uint8_t IAP_Set(bkp_type flag, uint32_t val)
-{
-    LL_RTC_BKP_SetRegister(TAMP,LL_RTC_BKP_DR0+flag,val);
-    return 0;
-}
-
 
 /******************************************************************************
 **函数信息 ：
