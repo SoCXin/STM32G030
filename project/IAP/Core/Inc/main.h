@@ -83,6 +83,7 @@ void Error_Handler(void);
   /* Definition of ADCx conversions data table size */
   #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  8)
 //extern RTC_HandleTypeDef hrtc;
+#define   feed_dog()         HAL_IWDG_Refresh(&hiwdg) //LL_IWDG_ReloadCounter(IWDG)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
