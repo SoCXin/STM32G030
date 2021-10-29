@@ -136,7 +136,7 @@ int main(void)
 	memset((char *)buf,0,sizeof(buf));
   uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
-  sprintf((char *)buf, "BLT:%x,%x,%d k\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),fsize);
+  sprintf((char *)buf, "BLT:%x-%x,%x-%x,%dk\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),fsize);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #endif
@@ -156,24 +156,22 @@ int main(void)
     bootloop();
 		LL_mDelay(1);
     // uart_tx_int(uwCRCValue);
-    if(rcnt%9000==0)
+    if(rcnt%900==0)
     {
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
-			// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-      LL_mDelay(3);
     }
 #endif
 		#ifdef APP1
-		if(rcnt%3000==0)
+		if(rcnt%100==0)
 		{
       uart_tx_str("App1 Mark\r\n",15);
       LL_mDelay(2);
 		}
 		else if(rcnt>10000)
     {
-				sprintf(buf, "APP1:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
+				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
         uart_tx_str((uint8_t *)buf,strlen((char *)buf));
         IAP_Set(bkp_app1_addr,0);
@@ -184,13 +182,13 @@ int main(void)
     }
 		#endif
 		#ifdef APP2
-		if(HAL_GetTick()%1000==0)
+		if(rcnt%100==0)
     {
       // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       uart_tx_str("app2 test\r\n",15);
       LL_mDelay(2);
     }
-		if(HAL_GetTick()>15000)
+		if(rcnt>1500)
     {
 				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
 				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
@@ -199,7 +197,7 @@ int main(void)
         IAP_Set(bkp_app2_mark,0);
         IAP_Set(bkp_app1_mark,0);
         IAP_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-				LL_mDelay(500);
+				LL_mDelay(200);
         NVIC_SystemReset();
     }
 		#endif

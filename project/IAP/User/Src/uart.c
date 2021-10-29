@@ -92,8 +92,8 @@ void uart_tx_str(uint8_t *str, uint16_t Len)
 {
     for(uint16_t i=0;i<Len;i++)
     {
-        while((USART1->ISR&0X40)==0);
         USART1->TDR = str[i] ;
+        while((USART1->ISR&0X40)==0);
         // LL_USART_TransmitData8(USART1, str[i]);
         // while(!LL_USART_IsActiveFlag_TC(USART1));
     }
