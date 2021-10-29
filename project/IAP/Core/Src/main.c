@@ -54,6 +54,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -105,6 +106,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_RTC_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
 	char buf[50];
@@ -120,6 +122,7 @@ int main(void)
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%dk\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),fsize);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+  feed_dog();
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -131,15 +134,16 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    feed_dog();
     rcnt++;
 		LL_mDelay(0);
+    feed_dog();
 //		HAL_Delay(2);
 #ifdef BLT
 		bootloop();
     // uart_tx_int(uwCRCValue);
     if(rcnt%1000==0)
     {
+      feed_dog();
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
@@ -149,6 +153,7 @@ int main(void)
 		#ifdef APP1
 		if(rcnt%1000==0)
 		{
+      feed_dog();
       uart_tx_str("App1 Mark\r\n",15);
 		}
 		else if(rcnt>10000)
@@ -167,6 +172,7 @@ int main(void)
 		#ifdef APP2
 		if(rcnt%1000==0)
     {
+      feed_dog();
       // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
       uart_tx_str("app2 test\r\n",15);
     }
@@ -246,6 +252,36 @@ void SystemClock_Config(void)
   }
   LL_RCC_EnableRTC();
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK1);
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  LL_IWDG_Enable(IWDG);
+  LL_IWDG_EnableWriteAccess(IWDG);
+  LL_IWDG_SetPrescaler(IWDG, LL_IWDG_PRESCALER_4);
+  LL_IWDG_SetReloadCounter(IWDG, 4095);
+  while (LL_IWDG_IsReady(IWDG) != 1)
+  {
+  }
+
+  LL_IWDG_ReloadCounter(IWDG);
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
+
 }
 
 /**

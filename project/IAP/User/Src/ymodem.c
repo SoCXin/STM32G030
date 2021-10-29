@@ -20,11 +20,8 @@ uint16_t u16Count1ms;
 
 void delay_ms(uint16_t ms)
 {
-    u16Count1ms = ms;
-    while(u16Count1ms)
-    {
-        feed_dog() ;
-    }
+    LL_mDelay(ms);//
+    feed_dog();
 }
 /******************************************************************************
 **函数信息 ：

@@ -29,6 +29,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
+#include "stm32g0xx_ll_iwdg.h"
 #include "stm32g0xx_ll_rcc.h"
 #include "stm32g0xx_ll_bus.h"
 #include "stm32g0xx_ll_system.h"
@@ -78,7 +79,7 @@ void Error_Handler(void);
 #define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 // extern IWDG_HandleTypeDef hiwdg;
-#define   feed_dog()         LL_mDelay(0)  //LL_IWDG_ReloadCounter(IWDG) //HAL_IWDG_Refresh(&hiwdg) //
+#define   feed_dog()         LL_IWDG_ReloadCounter(IWDG) //LL_mDelay(0)  //HAL_IWDG_Refresh(&hiwdg) //
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
