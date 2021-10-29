@@ -44,7 +44,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-IWDG_HandleTypeDef hiwdg;
 
 /* USER CODE BEGIN PV */
 
@@ -55,7 +54,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
-static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -107,7 +105,6 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_RTC_Init();
-  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   uart_init();
 	char buf[50];
@@ -249,35 +246,6 @@ void SystemClock_Config(void)
   }
   LL_RCC_EnableRTC();
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK1);
-}
-
-/**
-  * @brief IWDG Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_IWDG_Init(void)
-{
-
-  /* USER CODE BEGIN IWDG_Init 0 */
-
-  /* USER CODE END IWDG_Init 0 */
-
-  /* USER CODE BEGIN IWDG_Init 1 */
-
-  /* USER CODE END IWDG_Init 1 */
-  hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
-  hiwdg.Init.Window = 4095;
-  hiwdg.Init.Reload = 4095;
-  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN IWDG_Init 2 */
-
-  /* USER CODE END IWDG_Init 2 */
-
 }
 
 /**
