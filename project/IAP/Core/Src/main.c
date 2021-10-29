@@ -108,12 +108,9 @@ int main(void)
   MX_RTC_Init();
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
-  uart_init();
-	char buf[50];
 
+	char buf[50];
 #ifdef BLT
-//  uint8_t buf[32] = "\r\nSTM32G030 UART1(115200) BLT\r\n";
-//	HAL_UART_Transmit(&huart1,buf,sizeof(buf)-1,100);
 	bootinit();
 	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
@@ -122,7 +119,6 @@ int main(void)
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%dk\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),fsize);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-  feed_dog();
 #endif
     // FlashTestWR();
   /* USER CODE END 2 */
@@ -135,19 +131,17 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     rcnt++;
-		LL_mDelay(0);
+    LL_mDelay(0);
     feed_dog();
 //		HAL_Delay(2);
 #ifdef BLT
 		bootloop();
-    // uart_tx_int(uwCRCValue);
     if(rcnt%1000==0)
     {
       feed_dog();
 			memset((char *)buf,0,sizeof(buf));
 			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",IAP_Get(bkp_app1_addr),IAP_Get(bkp_app2_addr),IAP_Get(bkp_app1_mark),IAP_Get(bkp_app2_mark),IAP_Get(bkp_boot_mark));
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-//      LL_mDelay(3);
     }
 #endif
 		#ifdef APP1

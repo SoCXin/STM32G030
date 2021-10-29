@@ -124,6 +124,7 @@ uint8_t appjump(const uint32_t addr)
 *******************************************************************************/
 void bootinit(void)
 {
+    uart_init();
     uint16_t fsize = *(uint16_t *)(FLASHSIZE_BASE);
     if(IAP_Get(bkp_app1_addr)==0 && IAP_Get(bkp_app2_addr)==0 && IAP_Get(bkp_app1_mark)==0 && IAP_Get(bkp_app2_mark)==0)
     {
@@ -179,6 +180,7 @@ void bootinit(void)
 void bootloop(void)
 {
     if(app_ptr) Ymodem_Transmit(app_ptr);
+
     // uart_tx_char(u16Uart1RxIndex);
     // uart_tx_char(u8CntUart1Timer1ms);
 }
