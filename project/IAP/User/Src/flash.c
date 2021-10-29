@@ -111,16 +111,16 @@ uint8_t FlashPageWrite(uint32_t address, uint8_t *pbuf)
 *******************************************************************************/
 void FlashReset(uint8_t bank)
 {
-	for(uint16_t i=0; i<FLASH_PAGE_SIZE; i++)
-	{
-		FlashWriteBuf[i] = 0xff;
-	}
-	FlashPageWrite(bank * FLASH_PAGE_SIZE, FlashWriteBuf);
-	// for(i=0; i<FLASH_PAGE_SIZE; i++)
-	// {
-	// 	FlashWriteBuf[i] = 0;
-	// }
-	// FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
+    for(uint16_t i=0; i<FLASH_PAGE_SIZE; i++)
+    {
+        FlashWriteBuf[i] = 0xff;
+    }
+    FlashPageWrite(bank * FLASH_PAGE_SIZE, FlashWriteBuf);
+    // for(i=0; i<FLASH_PAGE_SIZE; i++)
+    // {
+    // 	FlashWriteBuf[i] = 0;
+    // }
+    // FlashPageRead(USER_APP1_ADDRESS, FlashWriteBuf);
 }
 
 

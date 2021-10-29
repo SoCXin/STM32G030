@@ -53,7 +53,7 @@ uint8_t  u8AdcTrig1ms;
 
 void BootTimerInterrupt(void)
 {
-    UartTimerInterrupt();
+    PortTimerInterrupt();
     if(++u16Timer1ms >= 1000)
     {
         u16Timer1ms = 0;
@@ -179,6 +179,8 @@ void bootinit(void)
 void bootloop(void)
 {
     if(app_ptr) Ymodem_Transmit(app_ptr);
+    // uart_tx_char(u16Uart1RxIndex);
+    // uart_tx_char(u8CntUart1Timer1ms);
 }
 
 /*------------------------- (C) COPYRIGHT 2021 OS-Q --------------------------*/
