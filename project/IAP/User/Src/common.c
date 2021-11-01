@@ -2,7 +2,6 @@
 #include "common.h"
 
 typedef  void (*pFunction)(void);
-pFunction Jump_To_Application;
 
 /******************************************************************************
 **函数信息 ：
@@ -23,11 +22,10 @@ void sysReset(void)
 *******************************************************************************/
 uint8_t appjump(const uint32_t addr)
 {
-    uint32_t JumpAddress;
     if (((*(__IO uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
     {
-        JumpAddress = *(__IO uint32_t*) (addr + 4);
-        Jump_To_Application = (pFunction) JumpAddress;
+        uint32_t JumpAddress = *(__IO uint32_t*) (addr + 4);
+        pFunction Jump_To_Application = (pFunction) JumpAddress;
         __set_MSP(*(__IO uint32_t*) addr);
         Jump_To_Application();
         return 0;

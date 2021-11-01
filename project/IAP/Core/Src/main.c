@@ -70,7 +70,7 @@ void StartSystemTask(void const * argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint32_t rcnt = 0;
+static uint32_t rcnt = 0;
 
 /* USER CODE END 0 */
 
@@ -110,13 +110,14 @@ int main(void)
 //  uint32_t rcnt = 0;
 #ifdef BLT
 	char buf[50];
-	bootinit();
-	LL_mDelay(30);
+//	bootinit();
+//	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+	appjump(USER_APP1_ADDRESS);
 #else
 	char buf[50];
   sprintf((char *)buf, "APP:%x-%x,%x-%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark));
@@ -177,7 +178,6 @@ int main(void)
     rcnt++;
     LL_mDelay(0);
     feed_dog();
-//		HAL_Delay(2);
 #ifdef BLT
 		bootloop();
     if(rcnt%1000==0)
@@ -188,45 +188,45 @@ int main(void)
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
     }
 #endif
-//		#ifdef APP1
-//		if(rcnt%1000==0)
-//		{
-//      feed_dog();
-//      uart_tx_str("App1 Mark\r\n",15);
-//		}
-//		else if(rcnt>10000)
-//    {
-//				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-//				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
-//        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-//        Mark_Set(bkp_app1_addr,0);
-//        Mark_Set(bkp_app1_mark,0);
-//        Mark_Set(bkp_app2_mark,0);
-//        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
-//				LL_mDelay(20);
-//        NVIC_SystemReset();
-//    }
-//		#endif
-//		#ifdef APP2
-//		if(rcnt%1000==0)
-//    {
-//      feed_dog();
-//      // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
-//      uart_tx_str("app2 test\r\n",15);
-//    }
-//		else if(rcnt>10000)
-//    {
-//				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-//				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
-//        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-//				Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-//        Mark_Set(bkp_app2_addr,0);
-//        Mark_Set(bkp_app2_mark,0);
-//        Mark_Set(bkp_app1_mark,0);
-//				LL_mDelay(50);
-//        NVIC_SystemReset();
-//    }
-//		#endif
+		#ifdef APP1
+		if(rcnt%1000==0)
+		{
+      feed_dog();
+      uart_tx_str("App1 Mark\r\n",15);
+		}
+		if(rcnt>5000)
+    {
+				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+        Mark_Set(bkp_app1_addr,0);
+        Mark_Set(bkp_app1_mark,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+				LL_mDelay(20);
+        NVIC_SystemReset();
+    }
+		#endif
+		#ifdef APP2
+		if(rcnt%1000==0)
+    {
+      feed_dog();
+      // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
+      uart_tx_str("app2 test\r\n",15);
+    }
+		else if(rcnt>10000)
+    {
+				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+				Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+        Mark_Set(bkp_app2_addr,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app1_mark,0);
+				LL_mDelay(50);
+        NVIC_SystemReset();
+    }
+		#endif
   }
   /* USER CODE END 3 */
 }
