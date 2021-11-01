@@ -10,12 +10,11 @@ extern "C" {
 #include "common.h"
 #include "ymodem.h"
 
-#ifdef BLT
+
 #define QITAS_BLT_MAX       0x2000
 #define QITAS_APP_MAX       0x4000
-
+#ifdef BLT
 #endif
-
 
 
 void bootinit(void);

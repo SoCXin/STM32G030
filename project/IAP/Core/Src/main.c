@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -27,6 +28,8 @@
 #include "common.h"
 #ifdef BLT
 #include "bootloader.h"
+#else
+#include "cmsis_os.h"
 #endif
 /* USER CODE END Includes */
 
@@ -41,13 +44,16 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#ifdef BLT
+#else
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
+osThreadId defaultTaskHandle;
+osThreadId SystemTaskHandle;
 /* USER CODE BEGIN PV */
-
+#endif
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,6 +62,9 @@ static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
 static void MX_IWDG_Init(void);
+void StartDefaultTask(void const * argument);
+void StartSystemTask(void const * argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -99,9 +108,9 @@ int main(void)
   MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
-	char buf[50];
-  uint32_t rcnt = 0;
+//  uint32_t rcnt = 0;
 #ifdef BLT
+	char buf[50];
 	bootinit();
 	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
@@ -109,12 +118,46 @@ int main(void)
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-#endif
+#else
     // FlashTestWR();
   /* USER CODE END 2 */
 
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* definition and creation of SystemTask */
+  osThreadDef(SystemTask, StartSystemTask, osPriorityNormal, 0, 128);
+  SystemTaskHandle = osThreadCreate(osThread(SystemTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+#endif
   while (1)
   {
     /* USER CODE END WHILE */
@@ -134,45 +177,45 @@ int main(void)
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
     }
 #endif
-		#ifdef APP1
-		if(rcnt%1000==0)
-		{
-      feed_dog();
-      uart_tx_str("App1 Mark\r\n",15);
-		}
-		else if(rcnt>10000)
-    {
-				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
-        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-        Mark_Set(bkp_app1_addr,0);
-        Mark_Set(bkp_app1_mark,0);
-        Mark_Set(bkp_app2_mark,0);
-        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
-				LL_mDelay(20);
-        NVIC_SystemReset();
-    }
-		#endif
-		#ifdef APP2
-		if(rcnt%1000==0)
-    {
-      feed_dog();
-      // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
-      uart_tx_str("app2 test\r\n",15);
-    }
-		else if(rcnt>10000)
-    {
-				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
-        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-				Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-        Mark_Set(bkp_app2_addr,0);
-        Mark_Set(bkp_app2_mark,0);
-        Mark_Set(bkp_app1_mark,0);
-				LL_mDelay(50);
-        NVIC_SystemReset();
-    }
-		#endif
+//		#ifdef APP1
+//		if(rcnt%1000==0)
+//		{
+//      feed_dog();
+//      uart_tx_str("App1 Mark\r\n",15);
+//		}
+//		else if(rcnt>10000)
+//    {
+//				sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+//				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen(buf),100);
+//        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+//        Mark_Set(bkp_app1_addr,0);
+//        Mark_Set(bkp_app1_mark,0);
+//        Mark_Set(bkp_app2_mark,0);
+//        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+//				LL_mDelay(20);
+//        NVIC_SystemReset();
+//    }
+//		#endif
+//		#ifdef APP2
+//		if(rcnt%1000==0)
+//    {
+//      feed_dog();
+//      // HAL_UART_Transmit(&huart1,"test app2\r\n",15,100);
+//      uart_tx_str("app2 test\r\n",15);
+//    }
+//		else if(rcnt>10000)
+//    {
+//				sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+//				// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
+//        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+//				Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+//        Mark_Set(bkp_app2_addr,0);
+//        Mark_Set(bkp_app2_mark,0);
+//        Mark_Set(bkp_app1_mark,0);
+//				LL_mDelay(50);
+//        NVIC_SystemReset();
+//    }
+//		#endif
   }
   /* USER CODE END 3 */
 }
@@ -340,7 +383,7 @@ static void MX_USART1_UART_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USART1 interrupt Init */
-  NVIC_SetPriority(USART1_IRQn, 0);
+  NVIC_SetPriority(USART1_IRQn, 3);
   NVIC_EnableIRQ(USART1_IRQn);
 
   /* USER CODE BEGIN USART1_Init 1 */
@@ -419,7 +462,7 @@ static void MX_GPIO_Init(void)
   LL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  NVIC_SetPriority(EXTI4_15_IRQn, 0);
+  NVIC_SetPriority(EXTI4_15_IRQn, 3);
   NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 }
@@ -427,6 +470,51 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  #ifndef BLT
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(100);
+    feed_dog();
+  }
+  /* USER CODE END 5 */
+  #endif
+}
+
+/* USER CODE BEGIN Header_StartSystemTask */
+/**
+* @brief Function implementing the SystemTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSystemTask */
+void StartSystemTask(void const * argument)
+{
+  /* USER CODE BEGIN StartSystemTask */
+  #ifndef BLT
+  char buf[50];
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1000);
+    uart_tx_str("App Mark\r\n",15);
+    // sprintf(buf, "\r\nAPP Mark:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+    // uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+  }
+  /* USER CODE END StartSystemTask */
+  #endif
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
