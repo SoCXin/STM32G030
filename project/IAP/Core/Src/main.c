@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -119,6 +119,9 @@ int main(void)
 	// HAL_UART_Transmit(&huart1,(uint8_t *)buf,strlen((char *)buf),100);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #else
+	char buf[50];
+  sprintf((char *)buf, "BLT:%x-%x,%x-%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark));
+  uart_tx_str((uint8_t *)buf,strlen((char *)buf));
     // FlashTestWR();
   /* USER CODE END 2 */
 
@@ -140,7 +143,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 64);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of SystemTask */
@@ -488,8 +491,8 @@ void StartDefaultTask(void const * argument)
     osDelay(100);
     feed_dog();
   }
-  /* USER CODE END 5 */
   #endif
+  /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_StartSystemTask */
@@ -512,8 +515,8 @@ void StartSystemTask(void const * argument)
     // sprintf(buf, "\r\nAPP Mark:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
     // uart_tx_str((uint8_t *)buf,strlen((char *)buf));
   }
-  /* USER CODE END StartSystemTask */
   #endif
+  /* USER CODE END StartSystemTask */
 }
 
 /**

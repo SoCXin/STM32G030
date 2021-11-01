@@ -21,8 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32g0xx_it.h"
-
-
+#include "FreeRTOS.h"
+#include "task.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -114,9 +114,7 @@ void SysTick_Handler(void)
   if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
   {
 #endif /* INCLUDE_xTaskGetSchedulerState */
-	#ifndef BLT
   xPortSysTickHandler();
-	#endif
 #if (INCLUDE_xTaskGetSchedulerState == 1 )
   }
 #endif /* INCLUDE_xTaskGetSchedulerState */
