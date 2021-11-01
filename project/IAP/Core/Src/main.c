@@ -53,6 +53,7 @@ osThreadId defaultTaskHandle;
 osThreadId SystemTaskHandle;
 /* USER CODE BEGIN PV */
 #endif
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,7 +63,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
 static void MX_IWDG_Init(void);
 void StartDefaultTask(void const * argument);
-void StartSystemTask(void const * argument);
+extern void StartSystemTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -70,8 +71,49 @@ void StartSystemTask(void const * argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-
+#ifndef BLT
+void StartSystemTask(void const * argument)
+{
+  /* USER CODE BEGIN StartSystemTask */
+  char buf[50];
+  static uint32_t rcnt = 0;
+  /* Infinite loop */
+  for(;;)
+  {
+    rcnt++;
+    #ifdef APP1
+    osDelay(1000);
+    uart_tx_str("App1 Mark\r\n",15);
+    if(rcnt>5)
+    {
+        sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+        Mark_Set(bkp_app1_addr,0);
+        Mark_Set(bkp_app1_mark,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
+        osDelay(10);
+        sysReset();
+    }
+    #endif
+    #ifdef APP2
+    osDelay(1000);
+    uart_tx_str("app2 test\r\n",15);
+    if(rcnt>5)
+    {
+        sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+        Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
+        Mark_Set(bkp_app2_addr,0);
+        Mark_Set(bkp_app2_mark,0);
+        Mark_Set(bkp_app1_mark,0);
+        osDelay(10);
+        sysReset();
+    }
+    #endif
+  }
+}
+#endif
 /* USER CODE END 0 */
 
 /**
@@ -117,7 +159,6 @@ int main(void)
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-//
 #else
 //	SCB->VTOR = USER_APP2_ADDRESS;
 //	appjump(USER_APP2_ADDRESS);
@@ -148,7 +189,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 64);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityLow, 0, 64);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of SystemTask */
@@ -395,32 +436,39 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  LL_EXTI_InitTypeDef EXTI_InitStruct = {0};
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOC);
   LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
   LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
+
+  /**/
+  LL_GPIO_ResetOutputPin(LED3_GPIO_Port, LED3_Pin);
+
+  /**/
+  LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
 
   /**/
   LL_GPIO_ResetOutputPin(LED1_GPIO_Port, LED1_Pin);
 
   /**/
-  LL_EXTI_SetEXTISource(LL_EXTI_CONFIG_PORTC, LL_EXTI_CONFIG_LINE13);
+  LL_GPIO_ResetOutputPin(RS485_EN_GPIO_Port, RS485_EN_Pin);
 
   /**/
-  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_13;
-  EXTI_InitStruct.LineCommand = ENABLE;
-  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
-  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_RISING_FALLING;
-  LL_EXTI_Init(&EXTI_InitStruct);
+  GPIO_InitStruct.Pin = LED3_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(LED3_GPIO_Port, &GPIO_InitStruct);
 
   /**/
-  LL_GPIO_SetPinPull(KEY1_GPIO_Port, KEY1_Pin, LL_GPIO_PULL_NO);
-
-  /**/
-  LL_GPIO_SetPinMode(KEY1_GPIO_Port, KEY1_Pin, LL_GPIO_MODE_INPUT);
+  GPIO_InitStruct.Pin = LED2_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
 
   /**/
   GPIO_InitStruct.Pin = LED1_Pin;
@@ -430,9 +478,43 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 
-  /* EXTI interrupt init*/
-  NVIC_SetPriority(EXTI4_15_IRQn, 3);
-  NVIC_EnableIRQ(EXTI4_15_IRQn);
+  /**/
+  GPIO_InitStruct.Pin = AUTO_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(AUTO_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = HALL1_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(HALL1_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = HALL2_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(HALL2_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = HALL3_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(HALL3_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = SD_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(SD_GPIO_Port, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = RS485_EN_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(RS485_EN_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -459,56 +541,6 @@ void StartDefaultTask(void const * argument)
   }
   #endif
   /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartSystemTask */
-/**
-* @brief Function implementing the SystemTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartSystemTask */
-void StartSystemTask(void const * argument)
-{
-  /* USER CODE BEGIN StartSystemTask */
-  char buf[50];
-  static uint32_t rcnt = 0;
-  /* Infinite loop */
-  for(;;)
-  {
-    rcnt++;
-    #ifdef APP1
-    osDelay(1000);
-    uart_tx_str("App1 Mark\r\n",15);
-    if(rcnt>5)
-    {
-        sprintf(buf, "\r\nAPP1:%x,%x,%x,%x,%x\r\n\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-        Mark_Set(bkp_app1_addr,0);
-        Mark_Set(bkp_app1_mark,0);
-        Mark_Set(bkp_app2_mark,0);
-        Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
-        osDelay(10);
-        sysReset();
-    }
-    #endif
-    #ifdef APP2
-    osDelay(1000);
-    uart_tx_str("app2 test\r\n",15);
-    if(rcnt>5)
-    {
-        sprintf((char *)buf, "APP2:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
-        uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-        Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
-        Mark_Set(bkp_app2_addr,0);
-        Mark_Set(bkp_app2_mark,0);
-        Mark_Set(bkp_app1_mark,0);
-        osDelay(10);
-        sysReset();
-    }
-    #endif
-  }
-  /* USER CODE END StartSystemTask */
 }
 
 /**

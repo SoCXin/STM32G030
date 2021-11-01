@@ -52,7 +52,6 @@ void HardFault_Handler(void);
 void SysTick_Handler(void);
 void FLASH_IRQHandler(void);
 void RCC_IRQHandler(void);
-void EXTI4_15_IRQHandler(void);
 void USART1_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
