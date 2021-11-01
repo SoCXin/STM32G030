@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "port.h"
+#include "uart.h"
 
 #define USER_APP1_ADDRESS   0x08004000
 #define USER_APP2_ADDRESS   0x08008000

@@ -674,8 +674,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Src\port.c</PathWithFileName>
-      <FilenameWithoutPath>port.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Src\uart.c</PathWithFileName>
+      <FilenameWithoutPath>uart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -698,8 +698,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Src\ymodem.c</PathWithFileName>
-      <FilenameWithoutPath>ymodem.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Src\common.c</PathWithFileName>
+      <FilenameWithoutPath>common.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -710,8 +710,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Src\bootloader.c</PathWithFileName>
-      <FilenameWithoutPath>bootloader.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Src\ymodem.c</PathWithFileName>
+      <FilenameWithoutPath>ymodem.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -722,8 +722,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\Src\common.c</PathWithFileName>
-      <FilenameWithoutPath>common.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\Src\bootloader.c</PathWithFileName>
+      <FilenameWithoutPath>bootloader.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
