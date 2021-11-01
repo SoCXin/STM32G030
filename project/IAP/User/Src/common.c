@@ -31,13 +31,12 @@ uint8_t appjump(const uint32_t addr)
         __set_PSP(*(__IO uint32_t*) addr);
         __set_MSP(*(__IO uint32_t*) addr);
         __set_CONTROL(0);
-        SCB->VTOR = USER_APP1_ADDRESS;
+        SCB->VTOR = addr;
         Jump_To_Application();
         return 0;
     }
     else return 1;
 }
-
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
