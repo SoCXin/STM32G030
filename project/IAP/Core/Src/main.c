@@ -19,7 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -120,8 +119,17 @@ int main(void)
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #else
 	char buf[50];
-  sprintf((char *)buf, "BLT:%x-%x,%x-%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark));
+  sprintf((char *)buf, "APP:%x-%x,%x-%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark));
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
+	feed_dog();
+//  if(Mark_Get(bkp_app1_mark))
+//  {
+//    if (appjump(Mark_Get(bkp_app1_addr))) Mark_Set(bkp_app1_mark,0);
+//  }
+//  else if(Mark_Get(bkp_app2_mark))
+//  {
+//    if (appjump(Mark_Get(bkp_app2_addr))) Mark_Set(bkp_app2_mark,0);
+//  }
     // FlashTestWR();
   /* USER CODE END 2 */
 

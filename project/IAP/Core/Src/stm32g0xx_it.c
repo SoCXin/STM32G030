@@ -21,8 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32g0xx_it.h"
-#include "FreeRTOS.h"
-#include "task.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -107,7 +106,7 @@ void HardFault_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+#ifndef BLT
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
 #if (INCLUDE_xTaskGetSchedulerState == 1 )
@@ -119,7 +118,7 @@ void SysTick_Handler(void)
   }
 #endif /* INCLUDE_xTaskGetSchedulerState */
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  #endif
   #ifdef BLT
   BootTimerInterrupt();
   #endif

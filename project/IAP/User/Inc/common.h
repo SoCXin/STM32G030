@@ -29,7 +29,7 @@ typedef enum
 void sysReset(void);
 uint8_t Mark_Set(bkp_type flag, uint32_t val);
 uint32_t Mark_Get(bkp_type flag);
-
+uint8_t appjump(const uint32_t addr);
 
 #ifdef __cplusplus
 }

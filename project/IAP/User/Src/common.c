@@ -1,6 +1,9 @@
 
 #include "common.h"
 
+typedef  void (*pFunction)(void);
+pFunction Jump_To_Application;
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
@@ -12,6 +15,26 @@ void sysReset(void)
     __disable_irq();     //不允许被打断，关总中断
     NVIC_SystemReset();
 }
+/******************************************************************************
+**函数信息 ：
+**功能描述 ：
+**输入参数 ：无
+**输出参数 ：无
+*******************************************************************************/
+uint8_t appjump(const uint32_t addr)
+{
+    uint32_t JumpAddress;
+    if (((*(__IO uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
+    {
+        JumpAddress = *(__IO uint32_t*) (addr + 4);
+        Jump_To_Application = (pFunction) JumpAddress;
+        __set_MSP(*(__IO uint32_t*) addr);
+        Jump_To_Application();
+        return 0;
+    }
+    else return 1;
+}
+
 /******************************************************************************
 **函数信息 ：
 **功能描述 ：
