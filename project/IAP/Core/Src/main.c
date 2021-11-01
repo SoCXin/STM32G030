@@ -110,8 +110,8 @@ int main(void)
 //  uint32_t rcnt = 0;
 #ifdef BLT
 	char buf[50];
-//	bootinit();
-//	LL_mDelay(30);
+	// bootinit();
+	// LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
   sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
@@ -119,18 +119,19 @@ int main(void)
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 	appjump(USER_APP1_ADDRESS);
 #else
+
 	char buf[50];
   sprintf((char *)buf, "APP:%x-%x,%x-%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark));
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
-	feed_dog();
-//  if(Mark_Get(bkp_app1_mark))
-//  {
-//    if (appjump(Mark_Get(bkp_app1_addr))) Mark_Set(bkp_app1_mark,0);
-//  }
-//  else if(Mark_Get(bkp_app2_mark))
-//  {
-//    if (appjump(Mark_Get(bkp_app2_addr))) Mark_Set(bkp_app2_mark,0);
-//  }
+	// feed_dog();
+  // if(Mark_Get(bkp_app1_mark))
+  // {
+  //   if (appjump(Mark_Get(bkp_app1_addr))) Mark_Set(bkp_app1_mark,0);
+  // }
+  // else if(Mark_Get(bkp_app2_mark))
+  // {
+  //   if (appjump(Mark_Get(bkp_app2_addr))) Mark_Set(bkp_app2_mark,0);
+  // }
     // FlashTestWR();
   /* USER CODE END 2 */
 

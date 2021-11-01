@@ -1,7 +1,7 @@
 
 #include "common.h"
 
-typedef  void (*pFunction)(void);
+
 
 /******************************************************************************
 **函数信息 ：
@@ -22,11 +22,16 @@ void sysReset(void)
 *******************************************************************************/
 uint8_t appjump(const uint32_t addr)
 {
+    typedef  void (*pFunction)(void);
     if (((*(__IO uint32_t*)addr) & 0x2FFE0000 ) == 0x20000000)
     {
+        __disable_irq();     	//关总中断
         uint32_t JumpAddress = *(__IO uint32_t*) (addr + 4);
         pFunction Jump_To_Application = (pFunction) JumpAddress;
+        __set_PSP(*(__IO uint32_t*) addr);
         __set_MSP(*(__IO uint32_t*) addr);
+        __set_CONTROL(0);
+        SCB->VTOR = USER_APP1_ADDRESS;
         Jump_To_Application();
         return 0;
     }
