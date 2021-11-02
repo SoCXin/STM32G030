@@ -1,8 +1,8 @@
 {
     "type":"MCU",
     "name":"STM32G030",
-    "title": "ST STM32G030 MCU",
-    "description":"ST Cortex-M0 MCU",
+    "title": "ST STM32G030",
+    "description":"Cortex-M0 MCU",
     "Core": {
         "num": 1,
         "type":"Cortex-M0",
@@ -21,7 +21,7 @@
     "version":"1.0.0",
     "series":["STM32G030"],
     "package":["SO8N","TSSOP20","LQFP32","LQFP48"],
-    "peripheral": ["ADC","USART","SPI","IIC"],
+    "peripheral": ["ADC","USART","SPI","I2C","I2S"],
     "keywords": [
         "dev-platform",
         "ARM",

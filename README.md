@@ -2,7 +2,7 @@
 
 [![sites](http://182.61.61.133/link/resources/SoC.png)](http://www.SoC.Xin)
 
-* [ST](https://www.st.com/zh/): [Cortex-M0+](https://github.com/SoCXin/Cortex)
+* [ST](https://www.st.com/zh/): [Cortex-M0+](https://github.com/SoCXin/Cortex) 90 nm
 * [L3R3](https://github.com/SoCXin/Level): 64 MHz (59 DMIPS, 142 CoreMark)
 
 ## [简介](https://github.com/SoCXin/STM32G030/wiki)
@@ -11,16 +11,19 @@
 
 ### 关键特性
 
-* 精确的内部时钟
-* 12bit ADC（2.5 MSps）
+* 64 MHz Cortex-M0+, 59 DMIPS
+* 1x 12bit 16ch SAR ADC (2.5 MSPS)
 * 5ch x DMA
+* 1KB OTP
+* RTC
+* I2S
 
 ### [资源收录](https://github.com/SoCXin)
 
 * [参考资源](src/)
 * [相关文档](docs/)
 * [典型应用](project/)
-* [入门教程](https://docs.soc.xin/STM32G030.html)
+* [Xin知识](https://docs.soc.xin/STM32G030)
 
 ### [选型建议](https://github.com/SoCXin)
 
@@ -30,16 +33,14 @@
 
 STM32G0x0超值系列的应用设计者能够随时升级到STM32G0x1（得益于完全的引脚排列兼容性）。
 
+如果[STM32G030](https://docs.soc.xin/ST/L/STM32G030.html#id14)不能解决你的问题，那就是也可以考虑用全家桶旗舰[STM32H730](https://github.com/SoCXin/STM32H730)
+
 #### 相关规格
 
-* STM32G030J:SO8N
+* STM32G030J:SO8N (4.9x6mm)
 * STM32G030F:TSSOP20
 * STM32G030K:LQFP32
 * STM32G030C:LQFP48
-
-### 验证开发板
-
-[![sites](docs/B.jpg)](https://item.taobao.com/item.htm?spm=a230r.1.14.20.340c136cE9GORW&id=615829096702&ns=1&abbucket=19#detail)
 
 #### 高可用度开源项目
 
@@ -47,4 +48,4 @@ STM32G0x0超值系列的应用设计者能够随时升级到STM32G0x1（得益�
 * [STM32CubeG0](https://github.com/STMicroelectronics/STM32CubeG0)
 * [rust API](https://github.com/stm32-rs/stm32g0xx-hal)
 
-### [探索芯世界 www.SoC.xin](http://www.SoC.Xin)
+### [探索芯世界 www.SoC.Xin](http://www.SoC.Xin)
