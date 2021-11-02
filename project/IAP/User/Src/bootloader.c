@@ -97,7 +97,7 @@ void bootinit(void)
     if(Mark_Get(bkp_app1_addr))
     {
         app_ptr=Mark_Get(bkp_app1_addr);
-        if(app_ptr < FLASH_ADDR_BASE+QITAS_APP_MAX || app_ptr > FLASH_ADDR_BASE + flash_size ||  app_ptr%FLASH_PAGE_SIZE)
+        if(app_ptr < FLASH_ADDR_BASE || app_ptr > FLASH_ADDR_BASE + flash_size ||  app_ptr%FLASH_PAGE_SIZE)
         {
             Mark_Set(bkp_app1_addr,USER_APP1_ADDRESS);
             app_ptr=USER_APP1_ADDRESS;      //默认地址
@@ -110,7 +110,7 @@ void bootinit(void)
     if(Mark_Get(bkp_app2_addr))
     {
         app_ptr=Mark_Get(bkp_app2_addr);
-        if(app_ptr< FLASH_ADDR_BASE+QITAS_APP_MAX || app_ptr > FLASH_ADDR_BASE + flash_size  || app_ptr%FLASH_PAGE_SIZE)
+        if(app_ptr< FLASH_ADDR_BASE || app_ptr > FLASH_ADDR_BASE + flash_size  || app_ptr%FLASH_PAGE_SIZE)
         {
             Mark_Set(bkp_app2_addr,USER_APP2_ADDRESS);
             app_ptr=USER_APP2_ADDRESS;
