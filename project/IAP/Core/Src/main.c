@@ -79,7 +79,7 @@ void StartSystemTask(void const * argument)
   static uint32_t rcnt = 0;
   /* Infinite loop */
   for(;;)
-  {
+  { 
     rcnt++;
     #ifdef APP1
     osDelay(1000);
@@ -222,7 +222,7 @@ int main(void)
     {
       feed_dog();
 			memset((char *)buf,0,sizeof(buf));
-			sprintf((char *)buf, "\r\nBKP:%x,%x,%x,%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
+			sprintf((char *)buf, "\r\nBKP:%x-%x,%x-%x,%x\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),Mark_Get(bkp_boot_mark));
       uart_tx_str((uint8_t *)buf,strlen((char *)buf));
     }
 #endif
