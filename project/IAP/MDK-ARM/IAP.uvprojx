@@ -408,6 +408,16 @@
               <FileType>1</FileType>
               <FilePath>..\User\Src\bootloader.c</FilePath>
             </File>
+            <File>
+              <FileName>aes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Src\aes.c</FilePath>
+            </File>
+            <File>
+              <FileName>test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1657,6 +1667,16 @@
               <FileType>1</FileType>
               <FilePath>..\User\Src\bootloader.c</FilePath>
             </File>
+            <File>
+              <FileName>aes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Src\aes.c</FilePath>
+            </File>
+            <File>
+              <FileName>test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2738,6 +2758,16 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>aes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Src\aes.c</FilePath>
+            </File>
+            <File>
+              <FileName>test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\test.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3698,6 +3728,16 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>aes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\Src\aes.c</FilePath>
+            </File>
+            <File>
+              <FileName>test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\test.c</FilePath>
             </File>
           </Files>
         </Group>

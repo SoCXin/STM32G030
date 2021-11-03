@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "common.h"
+#include "test.h"
 #ifdef BLT
 #include "bootloader.h"
 #else
@@ -154,10 +155,9 @@ int main(void)
 	char buf[50];
 	bootinit();
 //	appjump(USER_APP2_ADDRESS);
-	LL_mDelay(30);
 	memset((char *)buf,0,sizeof(buf));
 //  uint16_t *uuid = (uint16_t *) UID_BASE;
-  sprintf((char *)buf, "BLT:%x-%x,%x-%x,%d\r\n",Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
+  sprintf((char *)buf, "[%d]BLT:%x-%x,%x-%x,%d\r\n",test(),Mark_Get(bkp_app1_addr),Mark_Get(bkp_app2_addr),Mark_Get(bkp_app1_mark),Mark_Get(bkp_app2_mark),flash_size);
   uart_tx_str((uint8_t *)buf,strlen((char *)buf));
 #else
 //	SCB->VTOR = USER_APP2_ADDRESS;
