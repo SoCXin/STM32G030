@@ -1,18 +1,18 @@
 {
     "type":"MCU",
     "name":"STM32G030",
-    "title": "ST STM32G030",
-    "description":"Cortex-M0 MCU",
+    "title": "ST STM32G030 MCU",
+    "description":"ST Low Cost MCU",
     "Core": {
-        "num": 1,
-        "type":"Cortex-M0",
-        "Freq":64,
+        "CoreNum": 1,
+        "Core":"Cortex-M0",
+        "Fmax":64,
         "DMIPS": 59,
         "CoreMark": 142
     },
     "manufacturer": {
         "vendor":"ST",
-        "homepage":"https://www.st.com/zh/microcontrollers-microprocessors/stm32g0-series.html"
+        "homepage":"https://www.st.com"
     },
     "repository": {
         "type": "git",
@@ -22,13 +22,16 @@
     "series":["STM32G030"],
     "package":["SO8N","TSSOP20","LQFP32","LQFP48"],
     "peripheral": ["ADC","USART","SPI","I2C","I2S"],
+    "temp": [-40,85],
+    "volt": [2.0,3.6],
+    "ESD": {
+        "HBM": 4000,
+        "CDM": 500
+    },
     "keywords": [
-        "dev-platform",
-        "ARM",
-        "Cortex-M",
-        "STMicroelectronics",
-        "STM32",
-        "ADC","USART","I2C","RTC","SPI",
-        "3.6V","1.8V"
+        "Cortex-M0",
+        "ST",
+        "ADC","I2C","SPI","RTC","USART","I2S"
     ]
 }
+
