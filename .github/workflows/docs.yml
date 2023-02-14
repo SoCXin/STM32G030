@@ -1,0 +1,124 @@
+name: docs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 15 * * *'
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - '**.rst'
+      - '**/docs.yml'
+
+env:
+  DOCS_FOR: STM32G030
+
+jobs:
+  build:
+    if: github.repository_owner == 'SoCXin'
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+          token: ${{ secrets.SOC_XIN_TOCKEN }}
+          fetch-depth: 1
+
+      - name: Checkout Docs
+        uses: actions/checkout@v3
+        with:
+          repository: SoCXin/docs
+          token: ${{ secrets.SOC_XIN_TOCKEN }}
+          ref: ${{ env.DOCS_FOR }}
+          fetch-depth: 1
+          path: www
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        working-directory: www
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Build docs
+        working-directory: www
+        run: |
+          tox -e docs
+
+      - name: Preserve Docs
+        run: |
+          tar -czvf docs.tar.gz -C www/_build html rtdpage
+
+      - name: Save artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: docs.tar.gz
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      DOCS_REPO: SoCXin/web
+      DOCS_DIR: docs
+      LATEST_DOCS_DIR: latest
+      RELEASE_BUILD: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docs
+
+      - name: Unpack artifact
+        run: |
+          mkdir ./${{ env.LATEST_DOCS_DIR }}
+          tar -xzf ./docs.tar.gz -C ./${{ env.LATEST_DOCS_DIR }}
+
+      - name: Delete Artifact
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: docs
+
+      - name: Checkout latest Docs
+        continue-on-error: true
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.DOCS_REPO }}
+          path: ${{ env.DOCS_DIR }}
+          ref: gh-pages
+
+      - name: Synchronize Docs
+        run: |
+          rm -rf ${{ env.DOCS_DIR }}/.git
+          rm -rf ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/
+          mkdir -p ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/
+          cp -rf ${{ env.LATEST_DOCS_DIR }}/html/* ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/
+          if [[ ${{ env.RELEASE_BUILD }} == false ]]; then
+            rm -rf ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/page
+            mkdir -p ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/page
+            cp -rf ${{ env.LATEST_DOCS_DIR }}/rtdpage/* ${{ env.DOCS_DIR }}/${{ env.DOCS_FOR }}/page
+          fi
+
+      - name: Validate Docs
+        run: |
+          if [ -z "$(ls -A ${{ env.DOCS_DIR }})" ]; then
+            echo "Docs folder is empty. Aborting!"
+            exit 1
+          fi
+
+      - name: Github Pages Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.SOC_XIN_TOCKEN }}
+          external_repository: ${{ env.DOCS_REPO }}
+          publish_dir: ./${{ env.DOCS_DIR }}
+          commit_message: Sync Docs
