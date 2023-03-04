@@ -46,8 +46,6 @@ Doxyfile
 *.xlsx
 *.zip
 *.xcf
-*.png
-*.jpg
 *.rst
 *.srec
 # *_sc*
